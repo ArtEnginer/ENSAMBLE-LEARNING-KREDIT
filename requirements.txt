@@ -6,6 +6,8 @@ pandas>=1.5.0
 numpy>=1.21.0
 matplotlib>=3.5.0
 seaborn>=0.11.0
+openpyxl
+plotly
 
 # Machine Learning - Scikit-learn
 scikit-learn>=1.1.0
@@ -26,3 +28,10 @@ ipykernel>=6.0.0
 
 # Additional Utilities
 tqdm>=4.64.0
+
+# Requirements untuk Medical Prediction App
+joblib>=1.2.0
+scikit-learn>=1.2.0
+pandas>=1.5.0
+numpy>=1.21.0
+Flask>=2.0.0  # Jika membuat web app
