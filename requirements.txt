@@ -1,7 +1,3 @@
-# Credit Risk Modeling Project - Requirements
-# Generated for KREDITMACET.ipynb
-
-# Core Data Science Libraries
 pandas>=1.5.0
 numpy>=1.21.0
 matplotlib>=3.5.0
@@ -9,29 +5,17 @@ seaborn>=0.11.0
 openpyxl
 plotly
 
-# Machine Learning - Scikit-learn
 scikit-learn>=1.1.0
-
-# Gradient Boosting Libraries
 xgboost>=1.6.0
 lightgbm>=3.3.0
-
-# Imbalanced Learning
 imbalanced-learn>=0.9.0
-
-# Model Persistence
-joblib>=1.1.0
-
-# Jupyter Notebook Support (optional)
+joblib
 jupyter>=1.0.0
 ipykernel>=6.0.0
-
-# Additional Utilities
 tqdm>=4.64.0
 
-# Requirements untuk Medical Prediction App
 joblib>=1.2.0
 scikit-learn>=1.2.0
 pandas>=1.5.0
 numpy>=1.21.0
-Flask>=2.0.0  # Jika membuat web app
+Flask>=2.0.0  
