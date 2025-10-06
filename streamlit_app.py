@@ -16,99 +16,411 @@ st.set_page_config(
     },
 )
 
-# Custom CSS untuk styling yang lebih elegan dan mobile friendly
+# Custom CSS untuk Material Design 3 Android Style
 st.markdown(
     """
 <style>
-    /* Main styling */
-    .main-header {
-        font-size: 2.5rem !important;
-        font-weight: 700 !important;
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+    
+    /* Root Variables - Material Design 3 */
+    :root {
+        --md-primary: #6750A4;
+        --md-primary-container: #EADDFF;
+        --md-on-primary: #FFFFFF;
+        --md-secondary: #625B71;
+        --md-secondary-container: #E8DEF8;
+        --md-tertiary: #7D5260;
+        --md-surface: #FFFBFE;
+        --md-surface-variant: #E7E0EC;
+        --md-background: #F5F5FF;
+        --md-error: #B3261E;
+        --md-success: #198754;
+        --md-warning: #FFC107;
+        --md-shadow: rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Base Styling */
+    .stApp {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        font-family: 'Roboto', sans-serif;
+    }
+    
+    .main .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+        max-width: 1200px;
+    }
+    
+    /* Material Design App Bar */
+    .app-header {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 28px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        animation: slideDown 0.5s ease-out;
+    }
+    
+    .app-title {
+        font-size: 2.5rem;
+        font-weight: 700;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         text-align: center;
-        margin-bottom: 1rem;
+        margin: 0;
+        letter-spacing: -0.5px;
     }
     
-    .sub-header {
-        font-size: 1.2rem !important;
-        color: #6c757d !important;
+    .app-subtitle {
+        font-size: 1rem;
+        color: #5f6368;
         text-align: center;
-        margin-bottom: 2rem;
+        margin-top: 0.5rem;
+        font-weight: 400;
     }
     
-    /* Card styling */
-    .prediction-card {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        border-radius: 15px;
+    /* Material Card Design */
+    .material-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 24px;
         padding: 1.5rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        border-left: 5px solid #667eea;
-    }
-    
-    .risk-card {
-        border-radius: 15px;
-        padding: 1.5rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         margin-bottom: 1rem;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        animation: fadeIn 0.5s ease-out;
     }
     
-    .metric-card {
-        background: white;
-        border-radius: 10px;
-        padding: 1rem;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        border-left: 4px solid #667eea;
-        margin-bottom: 0.5rem;
+    .material-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
     }
     
-    /* Button styling */
+    /* Chip Design */
+    .status-chip {
+        display: inline-block;
+        padding: 6px 16px;
+        border-radius: 16px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        margin: 4px;
+        transition: all 0.2s ease;
+    }
+    
+    .chip-success {
+        background: #E8F5E9;
+        color: #2E7D32;
+    }
+    
+    .chip-warning {
+        background: #FFF3E0;
+        color: #E65100;
+    }
+    
+    .chip-error {
+        background: #FFEBEE;
+        color: #C62828;
+    }
+    
+    .chip-info {
+        background: #E3F2FD;
+        color: #1565C0;
+    }
+    
+    /* Modern Input Styling */
+    .stTextInput > div > div > input,
+    .stNumberInput > div > div > input,
+    .stSelectbox > div > div {
+        border-radius: 12px !important;
+        border: 2px solid #E7E0EC !important;
+        padding: 12px 16px !important;
+        font-size: 1rem !important;
+        transition: all 0.3s ease !important;
+        background: white !important;
+    }
+    
+    .stTextInput > div > div > input:focus,
+    .stNumberInput > div > div > input:focus,
+    .stSelectbox > div > div:focus-within {
+        border-color: #6750A4 !important;
+        box-shadow: 0 0 0 3px rgba(103, 80, 164, 0.1) !important;
+    }
+    
+    /* FAB (Floating Action Button) Style */
     .stButton button {
         width: 100%;
-        border-radius: 10px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        font-weight: 600;
-        border: none;
-        padding: 0.75rem 1.5rem;
-        transition: all 0.3s ease;
+        border-radius: 28px !important;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        font-weight: 600 !important;
+        border: none !important;
+        padding: 1rem 2rem !important;
+        font-size: 1.1rem !important;
+        letter-spacing: 0.5px !important;
+        box-shadow: 0 8px 24px rgba(103, 80, 164, 0.3) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        text-transform: uppercase !important;
     }
     
     .stButton button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transform: scale(1.02) translateY(-2px) !important;
+        box-shadow: 0 12px 32px rgba(103, 80, 164, 0.4) !important;
     }
     
-    /* Form styling */
+    .stButton button:active {
+        transform: scale(0.98) !important;
+    }
+    
+    /* Bottom Sheet Style Form */
     .stForm {
-        background: white;
-        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 24px 24px 0 0;
         padding: 2rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.12);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
     }
     
-    /* Progress bar styling */
-    .stProgress > div > div > div > div {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* Expander Material Design */
+    .streamlit-expanderHeader {
+        background: linear-gradient(135deg, #EADDFF 0%, #E8DEF8 100%) !important;
+        border-radius: 16px !important;
+        padding: 1rem 1.5rem !important;
+        font-weight: 600 !important;
+        font-size: 1.1rem !important;
+        color: #6750A4 !important;
+        border: none !important;
+        margin-bottom: 0.5rem !important;
+        transition: all 0.3s ease !important;
     }
     
-    /* Mobile optimization */
+    .streamlit-expanderHeader:hover {
+        background: linear-gradient(135deg, #D5C5F5 0%, #DDD0F3 100%) !important;
+        transform: translateX(4px);
+    }
+    
+    /* Progress Ring Design */
+    .progress-ring {
+        position: relative;
+        width: 180px;
+        height: 180px;
+        margin: 0 auto;
+    }
+    
+    .progress-ring-circle {
+        transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: rotate(-90deg);
+        transform-origin: 50% 50%;
+    }
+    
+    /* Result Card with Glassmorphism */
+    .result-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(40px);
+        -webkit-backdrop-filter: blur(40px);
+        border-radius: 28px;
+        padding: 2rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        margin: 1rem 0;
+        animation: scaleIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* Metric Card - Android Style */
+    .metric-container {
+        background: linear-gradient(135deg, rgba(103, 80, 164, 0.1) 0%, rgba(118, 75, 162, 0.05) 100%);
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin: 0.5rem 0;
+        border: 2px solid rgba(103, 80, 164, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .metric-container:hover {
+        background: linear-gradient(135deg, rgba(103, 80, 164, 0.15) 0%, rgba(118, 75, 162, 0.1) 100%);
+        border-color: rgba(103, 80, 164, 0.3);
+        transform: translateY(-2px);
+    }
+    
+    .metric-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #6750A4;
+        margin: 0;
+    }
+    
+    .metric-label {
+        font-size: 0.875rem;
+        color: #625B71;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 0.5rem;
+    }
+    
+    /* Sidebar Material Design */
+    section[data-testid="stSidebar"] {
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-right: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    section[data-testid="stSidebar"] > div {
+        padding-top: 2rem;
+    }
+    
+    /* Modern Divider */
+    hr {
+        border: none;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #E7E0EC, transparent);
+        margin: 2rem 0;
+    }
+    
+    /* Animations */
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    
+    @keyframes scaleIn {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+    
+    /* Ripple Effect */
+    .ripple {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .ripple::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.5);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+    
+    .ripple:active::after {
+        width: 300px;
+        height: 300px;
+    }
+    
+    /* Mobile Optimization */
     @media (max-width: 768px) {
-        .main-header {
-            font-size: 2rem !important;
+        .app-title {
+            font-size: 1.75rem;
         }
-        .sub-header {
-            font-size: 1rem !important;
+        
+        .app-subtitle {
+            font-size: 0.875rem;
+        }
+        
+        .material-card {
+            padding: 1rem;
+            border-radius: 20px;
+        }
+        
+        .result-card {
+            padding: 1.5rem;
         }
     }
     
-    /* Custom risk colors */
-    .risk-low { border-left: 5px solid #28a745 !important; }
-    .risk-medium { border-left: 5px solid #ffc107 !important; }
-    .risk-high { border-left: 5px solid #fd7e14 !important; }
-    .risk-very-high { border-left: 5px solid #dc3545 !important; }
-    .risk-extreme { border-left: 5px solid #6f42c1 !important; }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: rgba(231, 224, 236, 0.3);
+        border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+    }
+    
+    /* Info Alert Material Style */
+    .stAlert {
+        border-radius: 16px !important;
+        border: none !important;
+        padding: 1rem 1.5rem !important;
+        backdrop-filter: blur(10px);
+    }
+    
+    /* Success Badge */
+    .success-badge {
+        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-weight: 600;
+        display: inline-block;
+        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    }
+    
+    /* Warning Badge */
+    .warning-badge {
+        background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-weight: 600;
+        display: inline-block;
+        box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+    }
+    
+    /* Error Badge */
+    .error-badge {
+        background: linear-gradient(135deg, #F44336 0%, #D32F2F 100%);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-weight: 600;
+        display: inline-block;
+        box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+    }
 </style>
 """,
     unsafe_allow_html=True,
@@ -137,53 +449,86 @@ def load_model_package():
         return None, None, None, None, None
 
 
-def create_risk_gauge(confidence, risk_level):
-    """Create a visual risk gauge"""
+def create_circular_progress(confidence, risk_level):
+    """Create a circular progress indicator like Android"""
     color_map = {
-        1: "#28a745",  # Low - Green
-        2: "#ffc107",  # Medium - Yellow
-        3: "#fd7e14",  # High - Orange
-        4: "#dc3545",  # Very High - Red
-        5: "#6f42c1",  # Extreme - Purple
+        1: "#4CAF50",  # Success Green
+        2: "#FFC107",  # Warning Amber
+        3: "#FF9800",  # Orange
+        4: "#F44336",  # Error Red
+        5: "#9C27B0",  # Purple
     }
 
     color = color_map.get(risk_level, "#6c757d")
 
-    gauge_html = f"""
-    <div style="text-align: center; margin: 1rem 0;">
-        <div style="width: 200px; height: 200px; margin: 0 auto; position: relative;">
-            <div style="width: 100%; height: 100%; border-radius: 50%; 
-                        background: conic-gradient({color} 0% {confidence}%, #e9ecef {confidence}% 100%);
-                        position: relative;">
-                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-                            width: 80%; height: 80%; background: white; border-radius: 50%; 
-                            display: flex; align-items: center; justify-content: center;">
-                    <span style="font-size: 2rem; font-weight: bold; color: {color};">
-                        {confidence:.1f}%
-                    </span>
+    # Calculate circle parameters
+    radius = 70
+    circumference = 2 * 3.14159 * radius
+    offset = circumference - (confidence / 100) * circumference
+
+    progress_html = f"""
+    <div style="display: flex; justify-content: center; align-items: center; margin: 2rem 0;">
+        <div style="position: relative; width: 180px; height: 180px;">
+            <svg width="180" height="180" style="transform: rotate(-90deg);">
+                <circle
+                    cx="90"
+                    cy="90"
+                    r="{radius}"
+                    stroke="#E7E0EC"
+                    stroke-width="12"
+                    fill="none"
+                />
+                <circle
+                    cx="90"
+                    cy="90"
+                    r="{radius}"
+                    stroke="url(#gradient{risk_level})"
+                    stroke-width="12"
+                    fill="none"
+                    stroke-dasharray="{circumference}"
+                    stroke-dashoffset="{offset}"
+                    stroke-linecap="round"
+                    style="transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);"
+                />
+                <defs>
+                    <linearGradient id="gradient{risk_level}" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:{color};stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:{color};stop-opacity:0.7" />
+                    </linearGradient>
+                </defs>
+            </svg>
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                        text-align: center;">
+                <div style="font-size: 2.5rem; font-weight: 700; color: {color};">
+                    {confidence:.0f}%
+                </div>
+                <div style="font-size: 0.875rem; color: #625B71; font-weight: 500; margin-top: 4px; color:white;">
+                    CONFIDENCE
                 </div>
             </div>
         </div>
-        <div style="margin-top: 1rem; font-weight: bold; color: {color}; font-size: 1.2rem;">
-            Confidence Level
-        </div>
     </div>
     """
-    return gauge_html
+    return progress_html
 
 
 def main():
-    # Header dengan gradient yang lebih menarik
+    # Modern App Header
     st.markdown(
-        '<h1 class="main-header">🏦 Prediksi Kredit Macet</h1>', unsafe_allow_html=True
-    )
-    st.markdown(
-        '<p class="sub-header">Sistem Prediksi Kolektabilitas Kredit dengan Machine Learning</p>',
+        """
+    <div class="app-header">
+        <div style="text-align: center; margin-bottom: 0.5rem;">
+            <span style="font-size: 3rem;">🏦</span>
+        </div>
+        <h1 class="app-title">Credit Risk Analyzer</h1>
+        <p class="app-subtitle">AI-Powered Credit Assessment System</p>
+    </div>
+    """,
         unsafe_allow_html=True,
     )
 
     # Load model dengan progress indicator
-    with st.spinner("🔄 Memuat model machine learning..."):
+    with st.spinner("🔄 Loading AI Model..."):
         model, scaler, label_encoders, target_encoder, metadata = load_model_package()
 
     if model is None:
@@ -192,52 +537,89 @@ def main():
         )
         return
 
-    # Sidebar untuk model info dengan card yang lebih elegan
+    # Sidebar - Material Design
     with st.sidebar:
-        st.markdown("### 📊 Informasi Model")
-
-        if metadata:
-            with st.container():
-                st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-                st.metric(
-                    label="Model Type", value=metadata["model_info"]["model_name"]
-                )
-                st.markdown("</div>", unsafe_allow_html=True)
-
-                col_metrics1, col_metrics2 = st.columns(2)
-                with col_metrics1:
-                    st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-                    st.metric(
-                        label="Accuracy",
-                        value=f"{metadata['performance_metrics']['test_accuracy']:.4f}",
-                    )
-                    st.markdown("</div>", unsafe_allow_html=True)
-
-                with col_metrics2:
-                    st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-                    st.metric(
-                        label="F1-Score",
-                        value=f"{metadata['performance_metrics']['test_f1_weighted']:.4f}",
-                    )
-                    st.markdown("</div>", unsafe_allow_html=True)
-
-        st.markdown("---")
-        st.markdown("### 💡 Panduan Penggunaan")
-        st.info(
+        st.markdown(
             """
-        1. Isi semua data nasabah
-        2. Klik tombol prediksi
-        3. Lihat hasil dan rekomendasi
-        """
+        <div class="material-card">
+            <h3 style="color: #6750A4; margin-top: 0;">📊 Model Information</h3>
+        """,
+            unsafe_allow_html=True,
         )
 
-    # Main content area
-    # Untuk mobile friendly, kita gunakan single column layout dengan expander
-    st.markdown("### 📝 Input Data Nasabah")
+        if metadata:
+            st.markdown(
+                f"""
+            <div class="metric-container">
+                <div class="metric-value">{metadata['model_info']['model_name']}</div>
+                <div class="metric-label">Model Type</div>
+            </div>
+            """,
+                unsafe_allow_html=True,
+            )
+
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown(
+                    f"""
+                <div class="metric-container">
+                    <div class="metric-value">{metadata['performance_metrics']['test_accuracy']:.3f}</div>
+                    <div class="metric-label">Accuracy</div>
+                </div>
+                """,
+                    unsafe_allow_html=True,
+                )
+
+            with col2:
+                st.markdown(
+                    f"""
+                <div class="metric-container">
+                    <div class="metric-value">{metadata['performance_metrics']['test_f1_weighted']:.3f}</div>
+                    <div class="metric-label">F1-Score</div>
+                </div>
+                """,
+                    unsafe_allow_html=True,
+                )
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+        st.markdown("---")
+
+        st.markdown(
+            """
+        <div class="material-card">
+            <h3 style="color: #6750A4; margin-top: 0;">💡 Quick Guide</h3>
+            <div style="line-height: 2;">
+                <div style="display: flex; align-items: center; margin: 0.5rem 0;">
+                    <span style="font-size: 1.5rem; margin-right: 1rem;">📝</span>
+                    <span style="color: #625B71;">Fill customer data</span>
+                </div>
+                <div style="display: flex; align-items: center; margin: 0.5rem 0;">
+                    <span style="font-size: 1.5rem; margin-right: 1rem;">🎯</span>
+                    <span style="color: #625B71;">Click predict button</span>
+                </div>
+                <div style="display: flex; align-items: center; margin: 0.5rem 0;">
+                    <span style="font-size: 1.5rem; margin-right: 1rem;">📊</span>
+                    <span style="color: #625B71;">View results & insights</span>
+                </div>
+            </div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+
+    # Main Content with Material Cards
+    st.markdown(
+        """
+    <div class="material-card">
+        <h2 style="color: #6750A4; margin-top: 0;">📝 Customer Information</h2>
+    """,
+        unsafe_allow_html=True,
+    )
 
     with st.form("prediction_form"):
-        # Gunakan expander untuk mengorganisir form input
-        with st.expander("**Informasi Demografis**", expanded=True):
+        # Demografis
+        with st.expander("👤 **Demographic Information**", expanded=True):
             col1, col2 = st.columns(2)
 
             with col1:
@@ -261,21 +643,21 @@ def main():
                     (99, "99 - Lain-Lain"),
                 ]
                 pekerjaan = st.selectbox(
-                    "Pekerjaan",
+                    "Occupation",
                     options=pekerjaan_options,
                     format_func=lambda x: x[1],
-                    index=0,  # Default to first option (4)
+                    index=0,
                 )[0]
 
                 status_nikah = st.selectbox(
-                    "Status Pernikahan",
+                    "Marital Status",
                     ["B (Belum Menikah)", "D (Cerai)", "K (Kawin)"],
-                    index=2,  # Default to 'K' to match notebook
+                    index=2,
                 )
 
             with col2:
                 plafond = st.number_input(
-                    "Plafond Kredit (Rp)",
+                    "Credit Limit (IDR)",
                     min_value=0,
                     max_value=1000000000,
                     value=25000000,
@@ -284,36 +666,38 @@ def main():
                 )
 
                 jk_waktu = st.number_input(
-                    "Jangka Waktu (Bulan)",
+                    "Loan Period (Months)",
                     min_value=6,
                     max_value=360,
                     value=36,
                     help="Jangka waktu pengembalian kredit",
                 )
 
-        with st.expander("**Informasi Produk**", expanded=True):
+        # Produk Info
+        with st.expander("💳 **Product Information**", expanded=True):
             col3, col4 = st.columns(2)
 
             with col3:
-                produk = st.selectbox("Jenis Produk", ["Konsumer", "Mikro"], index=0)
+                produk = st.selectbox("Product Type", ["Konsumer", "Mikro"], index=0)
                 sub_produk = st.selectbox(
-                    "Sub Produk", ["KMG", "KPR", "Mikro KUR", "Mikro NON KUR"], index=1
+                    "Sub Product", ["KMG", "KPR", "Mikro KUR", "Mikro NON KUR"], index=1
                 )
 
             with col4:
                 status = st.selectbox(
-                    "Status Pengajuan",
+                    "Application Status",
                     ["Accept", "Lolos Bersyarat", "Reject", "Waiting Approval"],
                     index=0,
                 )
 
-        with st.expander("**Hasil Prescreening**", expanded=True):
+        # Prescreening
+        with st.expander("🔍 **Prescreening Results**", expanded=True):
             col5, col6 = st.columns(2)
 
             with col5:
-                slik = st.selectbox("Hasil SLIK", ["Low", "Medium", "High"], index=0)
+                slik = st.selectbox("SLIK Result", ["Low", "Medium", "High"], index=0)
                 sikpkur = st.selectbox(
-                    "Hasil SIKPKUR",
+                    "SIKPKUR Result",
                     [
                         "-",
                         "Terdaftar KUR",
@@ -323,23 +707,25 @@ def main():
                     index=0,
                 )
                 dukcapil = st.selectbox(
-                    "Hasil DUKCAPIL", ["Sesuai", "Tidak Sesuai"], index=0
+                    "DUKCAPIL Result", ["Sesuai", "Tidak Sesuai"], index=0
                 )
 
             with col6:
-                dhnbi = st.selectbox("Hasil DHNBI", ["Tidak", "Ya"], index=0)
+                dhnbi = st.selectbox("DHNBI Result", ["Tidak", "Ya"], index=0)
                 prescreening_1 = st.selectbox(
-                    "Hasil Prescreening 1", ["Lolos", "Tidak Lolos"], index=0
+                    "Prescreening 1 Result", ["Lolos", "Tidak Lolos"], index=0
                 )
 
-        # Predict button yang lebih menarik
+        # Submit Button
         submitted = st.form_submit_button(
-            "🎯 Prediksi Kolektabilitas Kredit",
+            "🎯 ANALYZE CREDIT RISK",
             use_container_width=True,
             type="primary",
         )
 
-    # Results section
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    # Results Section
     if submitted:
         try:
             # Extract code for model input
@@ -384,85 +770,127 @@ def main():
             predicted_label = class_labels[str(prediction_class)]
             confidence = max(prediction_proba) * 100
 
-            # Display results dengan layout yang lebih baik untuk mobile
+            # Display Results - Material Design Style
             st.markdown("---")
-            st.markdown("## 🎯 Hasil Prediksi")
 
-            # Main prediction card
-            risk_classes = {
-                1: ("risk-low", "✅"),
-                2: ("risk-medium", "🟡"),
-                3: ("risk-high", "🟠"),
-                4: ("risk-very-high", "🔴"),
-                5: ("risk-extreme", "🚨"),
+            # Risk Badge Mapping
+            risk_badges = {
+                1: ("success-badge", "✅ LOW RISK"),
+                2: ("warning-badge", "🟡 MEDIUM RISK"),
+                3: ("warning-badge", "🟠 HIGH RISK"),
+                4: ("error-badge", "🔴 VERY HIGH RISK"),
+                5: ("error-badge", "🚨 EXTREME RISK"),
             }
 
-            risk_class, emoji = risk_classes.get(prediction_class, ("", "❓"))
-
-            st.markdown(
-                f'<div class="prediction-card {risk_class}">', unsafe_allow_html=True
+            badge_class, badge_text = risk_badges.get(
+                prediction_class, ("", "❓ UNKNOWN")
             )
 
-            col_result1, col_result2 = st.columns([1, 2])
+            st.markdown(
+                f"""
+            <div class="result-card">
+                <div style="text-align: center;">
+                    <div class="{badge_class}" style="font-size: 1.2rem; margin-bottom: 1rem;">
+                        {badge_text}
+                    </div>
+                    <h2 style="color: #6750A4; margin: 0.5rem 0;">{predicted_label}</h2>
+                </div>
+            """,
+                unsafe_allow_html=True,
+            )
 
-            with col_result1:
-                # Gauge chart
-                st.markdown(
-                    create_risk_gauge(confidence, prediction_class),
-                    unsafe_allow_html=True,
-                )
+            # Circular Progress
+            st.markdown(
+                create_circular_progress(confidence, prediction_class),
+                unsafe_allow_html=True,
+            )
 
-            with col_result2:
-                st.markdown(f"### {emoji} {predicted_label}")
-                st.markdown(f"**Tingkat Keyakinan:** {confidence:.2f}%")
+            # Risk Description
+            risk_descriptions = {
+                1: "✅ Nasabah memiliki track record yang baik dan kemungkinan besar akan melunasi kredit tepat waktu.",
+                2: "🟡 Nasabah memerlukan monitoring berkala. Terdapat potensi keterlambatan pembayaran.",
+                3: "🟠 Kredit kurang lancar. Direkomendasikan untuk melakukan verifikasi tambahan dan tindakan preventif.",
+                4: "🔴 Kredit sangat diragukan. Perlu evaluasi mendalam sebelum approval.",
+                5: "🚨 Risiko kredit macet sangat tinggi. Pertimbangan khusus sangat diperlukan.",
+            }
 
-                # Risk description
-                risk_descriptions = {
-                    1: "Nasabah berpotensi melunasi kredit dengan lancar. Risiko rendah.",
-                    2: "Perlu perhatian khusus dalam monitoring. Risiko sedang.",
-                    3: "Kredit kurang lancar, perlu tindakan preventif. Risiko tinggi.",
-                    4: "Kredit diragukan, perlu evaluasi mendalam. Risiko sangat tinggi.",
-                    5: "Kredit berpotensi macet, pertimbangan khusus diperlukan. Risiko ekstrim.",
-                }
-
-                st.info(
-                    risk_descriptions.get(
-                        prediction_class, "Risiko tidak teridentifikasi."
-                    )
-                )
+            st.markdown(
+                f"""
+                <div class="material-card" style="background: rgba(255, 255, 255, 0.7); margin-top: 1rem;">
+                    <p style="color: #625B71; font-size: 1rem; line-height: 1.6; margin: 0;">
+                        {risk_descriptions.get(prediction_class, "Risiko tidak teridentifikasi.")}
+                    </p>
+                </div>
+            """,
+                unsafe_allow_html=True,
+            )
 
             st.markdown("</div>", unsafe_allow_html=True)
 
-            # Probability breakdown dengan visual yang lebih baik
-            st.markdown("### 📊 Detail Probabilitas")
+            # Probability Breakdown
+            st.markdown(
+                """
+            <div class="material-card" style="margin-top: 1rem;">
+                <h3 style="color: #6750A4; margin-top: 0;">📊 Detailed Risk Analysis</h3>
+            """,
+                unsafe_allow_html=True,
+            )
 
-            prob_data = []
             for i, prob in enumerate(prediction_proba):
                 actual_class = target_encoder.classes_[i]
                 class_label = class_labels[str(actual_class)]
                 prob_percent = prob * 100
 
-                col_prob1, col_prob2, col_prob3 = st.columns([1, 3, 1])
-                with col_prob1:
-                    st.markdown(f"**{actual_class}**")
-                with col_prob2:
-                    st.progress(float(prob))
-                with col_prob3:
-                    st.markdown(f"**{prob_percent:.1f}%**")
+                # Color coding
+                if prob_percent > 50:
+                    bar_color = "#F44336"
+                elif prob_percent > 30:
+                    bar_color = "#FF9800"
+                elif prob_percent > 15:
+                    bar_color = "#FFC107"
+                else:
+                    bar_color = "#4CAF50"
 
-                st.caption(f"{class_label}")
-                st.markdown("---")
+                st.markdown(
+                    f"""
+                <div style="margin: 1rem 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <span style="font-weight: 600; color: white;">Class {actual_class} - {class_label}</span>
+                        <span style="font-weight: 700; color: {bar_color}; font-size: 1.1rem;">{prob_percent:.1f}%</span>
+                    </div>
+                    <div style="background: #E7E0EC; border-radius: 10px; height: 12px; overflow: hidden;">
+                        <div style="background: linear-gradient(90deg, {bar_color}, {bar_color}CC); 
+                                    width: {prob_percent}%; height: 100%; border-radius: 10px;
+                                    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);"></div>
+                    </div>
+                </div>
+                """,
+                    unsafe_allow_html=True,
+                )
+
+            st.markdown("</div>", unsafe_allow_html=True)
 
         except Exception as e:
-            st.error(f"❌ Error dalam prediksi: {str(e)}")
-            st.info("Silakan periksa input data dan coba lagi.")
+            st.markdown(
+                f"""
+            <div class="material-card" style="background: #FFEBEE; border-left: 4px solid #F44336;">
+                <h4 style="color: #C62828; margin-top: 0;">❌ Prediction Error</h4>
+                <p style="color: #D32F2F; margin: 0;">{str(e)}</p>
+            </div>
+            """,
+                unsafe_allow_html=True,
+            )
 
-    # Footer yang lebih informatif
+    # Footer
     st.markdown("---")
     st.markdown(
         """
-    <div style="text-align: center; color: #6c757d; margin-top: 2rem;">
-        <p>© 2024 Sistem Prediksi Kredit Macet. All rights reserved.</p>
+    <div style="text-align: center; padding: 2rem 0;">
+        <div class="material-card" style="max-width: 600px; margin: 0 auto;">
+            <p style="color: #625B71; margin: 0; font-size: 0.875rem;">
+                <strong>Credit Risk Analyzer</strong> © 2025
+            </p>
+        </div>
     </div>
     """,
         unsafe_allow_html=True,
