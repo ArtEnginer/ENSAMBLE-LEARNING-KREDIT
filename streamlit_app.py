@@ -432,14 +432,14 @@ def load_model_package():
     """Load model and preprocessing objects"""
     try:
         # Load model and preprocessing objects
-        model = joblib.load("models/best_model_random_forest_20251003_103852.joblib")
-        scaler = joblib.load("models/scaler_20251003_103852.joblib")
-        label_encoders = joblib.load("models/label_encoders_20251003_103852.joblib")
-        target_encoder = joblib.load("models/target_encoder_20251003_103852.joblib")
+        model = joblib.load("models/best_model_lightgbm_20251216_103357.joblib")
+        scaler = joblib.load("models/scaler_20251216_103357.joblib")
+        label_encoders = joblib.load("models/label_encoders_20251216_103357.joblib")
+        target_encoder = joblib.load("models/target_encoder_20251216_103357.joblib")
 
         # Load metadata
         with open(
-            "models/model_metadata_20251003_103852.json", "r", encoding="utf-8"
+            "models/model_metadata_20251216_103357.json", "r", encoding="utf-8"
         ) as f:
             metadata = json.load(f)
 
@@ -656,6 +656,14 @@ def main():
                 )
 
             with col2:
+                usia = st.number_input(
+                    "Age (Years)",
+                    min_value=17,
+                    max_value=100,
+                    value=40,
+                    help="Usia pemohon kredit",
+                )
+
                 plafond = st.number_input(
                     "Credit Limit (IDR)",
                     min_value=0,
@@ -731,30 +739,38 @@ def main():
             # Extract code for model input
             status_nikah_code = status_nikah[0]
 
-            # Prepare input data
+            # Prepare input data - Must match model features exactly:
+            # ["Produk", "Status Pernikahan", "Jangka Waktu", "Sub Produk", "Usia",
+            #  "Hasil Prescreening SIPKUR", "Status Aplikasi", "Plafond",
+            #  "Hasil Prescreening Dukcapil", "Pekerjaan"]
             input_data = pd.DataFrame(
                 {
-                    "PEKERJAAN": [pekerjaan],
-                    "PLAFOND": [plafond],
-                    "JK_WAKTUBULAN": [jk_waktu],
-                    "STATUS_PERNIKAHAN": [status_nikah_code],
-                    "PRODUK": [produk],
-                    "SUB_PRODUK": [sub_produk],
-                    "HASIL_PRESCREENING_SLIK": [slik],
-                    "HASIL_PRESCREENING_SIKPKUR": [sikpkur],
-                    "HASIL_PRESCREENING_DUKCAPIL": [dukcapil],
-                    "HASIL_PRESCREENING_DHNBI": [dhnbi],
-                    "HASIL_PRESCREENING_1": [prescreening_1],
-                    "STATUS": [status],
+                    "Produk": [produk],
+                    "Status Pernikahan": [status_nikah_code],
+                    "Jangka Waktu": [jk_waktu],
+                    "Sub Produk": [sub_produk],
+                    "Usia": [usia],
+                    "Hasil Prescreening SIPKUR": [sikpkur],
+                    "Status Aplikasi": [status],
+                    "Plafond": [plafond],
+                    "Hasil Prescreening Dukcapil": [dukcapil],
+                    "Pekerjaan": [pekerjaan],
                 }
             )
 
             # Encode categorical features
-            categorical_features = metadata["feature_info"]["categorical_features"]
+            categorical_features = [
+                "Produk",
+                "Status Pernikahan",
+                "Sub Produk",
+                "Hasil Prescreening SIPKUR",
+                "Status Aplikasi",
+                "Hasil Prescreening Dukcapil",
+            ]
             input_encoded = input_data.copy()
 
             for col in categorical_features:
-                if col in input_data.columns:
+                if col in input_data.columns and col in label_encoders:
                     input_encoded[col] = label_encoders[col].transform(input_data[col])
 
             # Scale features

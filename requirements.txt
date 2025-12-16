@@ -18,4 +18,9 @@ joblib>=1.2.0
 scikit-learn>=1.2.0
 pandas>=1.5.0
 numpy>=1.21.0
+
+# Flask Web Application
+Flask>=2.3.0
+Flask-Cors>=4.0.0
+Werkzeug>=2.3.0
 Flask>=2.0.0  

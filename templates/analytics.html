@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+
+{% block title %}Analitik - Sistem Prediksi Kredit{% endblock %}
+
+{% block content %}
+<div class="space-y-6 fade-in">
+    <!-- Page Header -->
+    <div class="card-android material-shadow p-6">
+        <div class="flex items-center space-x-3">
+            <div class="bg-primary p-3 rounded-lg">
+                <i class="fas fa-chart-bar text-white text-2xl"></i>
+            </div>
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">Analitik & Statistik</h2>
+                <p class="text-gray-500">Visualisasi data prediksi secara mendalam</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Monthly Trend -->
+        <div class="card-android material-shadow p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">
+                <i class="fas fa-calendar-alt text-primary mr-2"></i>
+                Tren Bulanan
+            </h3>
+            <div style="height: 250px;">
+                <canvas id="monthlyTrendChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Risk Distribution -->
+        <div class="card-android material-shadow p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">
+                <i class="fas fa-exclamation-triangle text-primary mr-2"></i>
+                Distribusi Tingkat Risiko
+            </h3>
+            <div style="height: 250px;">
+                <canvas id="riskDistributionChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Job Categories -->
+        <div class="card-android material-shadow p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">
+                <i class="fas fa-briefcase text-primary mr-2"></i>
+                Top 10 Pekerjaan
+            </h3>
+            <div style="height: 250px;">
+                <canvas id="jobCategoriesChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Plafond Range -->
+        <div class="card-android material-shadow p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">
+                <i class="fas fa-money-bill-wave text-primary mr-2"></i>
+                Distribusi Plafond
+            </h3>
+            <div style="height: 250px;">
+                <canvas id="plafondRangeChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Statistics -->
+    <div class="card-android material-shadow p-6">
+        <h3 class="text-lg font-bold text-gray-800 mb-6">
+            <i class="fas fa-table text-primary mr-2"></i>
+            Statistik Detail
+        </h3>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left font-semibold text-gray-700">Kategori</th>
+                        <th class="px-4 py-3 text-center font-semibold text-gray-700">Total</th>
+                        <th class="px-4 py-3 text-center font-semibold text-gray-700">Lancar</th>
+                        <th class="px-4 py-3 text-center font-semibold text-gray-700">Macet</th>
+                        <th class="px-4 py-3 text-center font-semibold text-gray-700">Rasio (%)</th>
+                    </tr>
+                </thead>
+                <tbody id="statisticsTableBody" class="divide-y divide-gray-200">
+                    <!-- Will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function loadAnalytics() {
+        const history = getPredictionHistory();
+
+        if (history.length === 0) {
+            // Show empty state
+            document.querySelector('.space-y-6').innerHTML = `
+                <div class="card-android material-shadow p-16 text-center">
+                    <i class="fas fa-chart-bar text-6xl text-gray-300 mb-4"></i>
+                    <h3 class="text-xl font-bold text-gray-600 mb-2">Belum Ada Data Analitik</h3>
+                    <p class="text-gray-500 mb-6">Mulai dengan membuat prediksi untuk melihat analitik</p>
+                    <a href="/predict" class="inline-flex items-center space-x-2 px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primaryDark transition-colors">
+                        <i class="fas fa-plus"></i>
+                        <span>Buat Prediksi</span>
+                    </a>
+                </div>
+            `;
+            return;
+        }
+
+        initMonthlyTrend(history);
+        initRiskDistribution(history);
+        initJobCategories(history);
+        initPlafondRange(history);
+        initStatisticsTable(history);
+    }
+
+    function initMonthlyTrend(history) {
+        const ctx = document.getElementById('monthlyTrendChart').getContext('2d');
+
+        // Group by month
+        const monthlyData = {};
+        history.forEach(item => {
+            const date = new Date(item.timestamp);
+            const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+
+            if (!monthlyData[monthKey]) {
+                monthlyData[monthKey] = { lancar: 0, macet: 0 };
+            }
+
+            if (item.prediction === 'Lancar') {
+                monthlyData[monthKey].lancar++;
+            } else {
+                monthlyData[monthKey].macet++;
+            }
+        });
+
+        const labels = Object.keys(monthlyData).sort();
+        const lancarData = labels.map(key => monthlyData[key].lancar);
+        const macetData = labels.map(key => monthlyData[key].macet);
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Lancar',
+                    data: lancarData,
+                    backgroundColor: '#10b981'
+                }, {
+                    label: 'Tidak Lancar',
+                    data: macetData,
+                    backgroundColor: '#ef4444'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    function initRiskDistribution(history) {
+        const ctx = document.getElementById('riskDistributionChart').getContext('2d');
+
+        const riskCounts = {
+            'Sangat Rendah': 0,
+            'Rendah': 0,
+            'Sedang': 0,
+            'Tinggi': 0,
+            'Sangat Tinggi': 0
+        };
+
+        history.forEach(item => {
+            riskCounts[item.risk_level]++;
+        });
+
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: Object.keys(riskCounts),
+                datasets: [{
+                    data: Object.values(riskCounts),
+                    backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#f97316', '#ef4444']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    function initJobCategories(history) {
+        const ctx = document.getElementById('jobCategoriesChart').getContext('2d');
+
+        const jobCounts = {};
+        history.forEach(item => {
+            const job = item.input_summary.pekerjaan;
+            jobCounts[job] = (jobCounts[job] || 0) + 1;
+        });
+
+        const sorted = Object.entries(jobCounts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 10);
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: sorted.map(([job]) => job.length > 30 ? job.substring(0, 27) + '...' : job),
+                datasets: [{
+                    label: 'Jumlah',
+                    data: sorted.map(([, count]) => count),
+                    backgroundColor: '#6200ea'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    function initPlafondRange(history) {
+        const ctx = document.getElementById('plafondRangeChart').getContext('2d');
+
+        const ranges = {
+            '< 50 Juta': 0,
+            '50-100 Juta': 0,
+            '100-200 Juta': 0,
+            '200-500 Juta': 0,
+            '> 500 Juta': 0
+        };
+
+        history.forEach(item => {
+            const plafond = parseInt(item.input_summary.plafond.replace(/[^0-9]/g, ''));
+
+            if (plafond < 50000000) ranges['< 50 Juta']++;
+            else if (plafond < 100000000) ranges['50-100 Juta']++;
+            else if (plafond < 200000000) ranges['100-200 Juta']++;
+            else if (plafond < 500000000) ranges['200-500 Juta']++;
+            else ranges['> 500 Juta']++;
+        });
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(ranges),
+                datasets: [{
+                    data: Object.values(ranges),
+                    backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#f97316', '#ef4444']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    function initStatisticsTable(history) {
+        const tbody = document.getElementById('statisticsTableBody');
+
+        // Group by different criteria
+        const criteria = [
+            { name: 'Semua Data', filter: () => true },
+            { name: 'Usia < 30', filter: item => item.input_summary.usia < 30 },
+            { name: 'Usia 30-50', filter: item => item.input_summary.usia >= 30 && item.input_summary.usia <= 50 },
+            { name: 'Usia > 50', filter: item => item.input_summary.usia > 50 },
+            { name: 'Plafond < 100 Juta', filter: item => parseInt(item.input_summary.plafond.replace(/[^0-9]/g, '')) < 100000000 },
+            { name: 'Plafond ≥ 100 Juta', filter: item => parseInt(item.input_summary.plafond.replace(/[^0-9]/g, '')) >= 100000000 }
+        ];
+
+        tbody.innerHTML = criteria.map(({ name, filter }) => {
+            const filtered = history.filter(filter);
+            const total = filtered.length;
+            const lancar = filtered.filter(item => item.prediction === 'Lancar').length;
+            const macet = total - lancar;
+            const ratio = total > 0 ? ((lancar / total) * 100).toFixed(1) : 0;
+
+            return `
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3 font-medium text-gray-800">${name}</td>
+                    <td class="px-4 py-3 text-center">${total}</td>
+                    <td class="px-4 py-3 text-center text-green-600 font-semibold">${lancar}</td>
+                    <td class="px-4 py-3 text-center text-red-600 font-semibold">${macet}</td>
+                    <td class="px-4 py-3 text-center">
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold ${ratio >= 70 ? 'bg-green-100 text-green-800' : ratio >= 50 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}">
+                            ${ratio}%
+                        </span>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', loadAnalytics);
+</script>
+{% endblock %}

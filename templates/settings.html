@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block title %}Pengaturan - Sistem Prediksi Kredit{% endblock %}
+
+{% block content %}
+<div class="space-y-6 fade-in max-w-4xl">
+    <!-- Page Header -->
+    <div class="card-android material-shadow p-6">
+        <div class="flex items-center space-x-3">
+            <div class="bg-primary p-3 rounded-lg">
+                <i class="fas fa-cog text-white text-2xl"></i>
+            </div>
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">Pengaturan</h2>
+                <p class="text-gray-500">Konfigurasi aplikasi dan preferensi</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- General Settings -->
+    <div class="card-android material-shadow p-6">
+        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <i class="fas fa-sliders-h text-primary mr-2"></i>
+            Pengaturan Umum
+        </h3>
+        <div class="space-y-4">
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                    <h4 class="font-semibold text-gray-800">Mode Gelap</h4>
+                    <p class="text-sm text-gray-500">Ubah tampilan ke mode gelap</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" id="darkModeToggle">
+                    <div
+                        class="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-primary">
+                    </div>
+                </label>
+            </div>
+
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                    <h4 class="font-semibold text-gray-800">Notifikasi</h4>
+                    <p class="text-sm text-gray-500">Aktifkan notifikasi desktop</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" id="notificationToggle" checked>
+                    <div
+                        class="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-primary">
+                    </div>
+                </label>
+            </div>
+
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                    <h4 class="font-semibold text-gray-800">Auto-Save</h4>
+                    <p class="text-sm text-gray-500">Simpan prediksi otomatis ke riwayat</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" id="autoSaveToggle" checked>
+                    <div
+                        class="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-primary">
+                    </div>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Management -->
+    <div class="card-android material-shadow p-6">
+        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <i class="fas fa-database text-primary mr-2"></i>
+            Manajemen Data
+        </h3>
+        <div class="space-y-3">
+            <button onclick="exportAllData()"
+                class="w-full flex items-center justify-between p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-download text-blue-600"></i>
+                    <div class="text-left">
+                        <h4 class="font-semibold text-gray-800">Export Data</h4>
+                        <p class="text-sm text-gray-500">Download semua riwayat prediksi</p>
+                    </div>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400"></i>
+            </button>
+
+            <button onclick="clearCache()"
+                class="w-full flex items-center justify-between p-4 bg-yellow-50 hover:bg-yellow-100 rounded-lg transition-colors">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-broom text-yellow-600"></i>
+                    <div class="text-left">
+                        <h4 class="font-semibold text-gray-800">Bersihkan Cache</h4>
+                        <p class="text-sm text-gray-500">Hapus data cache lokal</p>
+                    </div>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400"></i>
+            </button>
+
+            <button onclick="resetSettings()"
+                class="w-full flex items-center justify-between p-4 bg-red-50 hover:bg-red-100 rounded-lg transition-colors">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-redo text-red-600"></i>
+                    <div class="text-left">
+                        <h4 class="font-semibold text-gray-800">Reset Pengaturan</h4>
+                        <p class="text-sm text-gray-500">Kembalikan ke pengaturan default</p>
+                    </div>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- About System -->
+    <div class="card-android material-shadow p-6">
+        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <i class="fas fa-info-circle text-primary mr-2"></i>
+            Tentang Sistem
+        </h3>
+        <div class="space-y-3 text-sm">
+            <div class="flex justify-between p-3 bg-gray-50 rounded-lg">
+                <span class="text-gray-600">Versi Aplikasi</span>
+                <span class="font-semibold">1.0.0</span>
+            </div>
+            <div class="flex justify-between p-3 bg-gray-50 rounded-lg">
+                <span class="text-gray-600">Model Version</span>
+                <span class="font-semibold">{{ metadata.timestamp }}</span>
+            </div>
+            <div class="flex justify-between p-3 bg-gray-50 rounded-lg">
+                <span class="text-gray-600">Framework</span>
+                <span class="font-semibold">Flask + Tailwind CSS</span>
+            </div>
+            <div class="flex justify-between p-3 bg-gray-50 rounded-lg">
+                <span class="text-gray-600">Machine Learning</span>
+                <span class="font-semibold">{{ metadata.model_name }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Load settings from localStorage
+    function loadSettings() {
+        const darkMode = localStorage.getItem('darkMode') === 'true';
+        const notifications = localStorage.getItem('notifications') !== 'false';
+        const autoSave = localStorage.getItem('autoSave') !== 'false';
+
+        document.getElementById('darkModeToggle').checked = darkMode;
+        document.getElementById('notificationToggle').checked = notifications;
+        document.getElementById('autoSaveToggle').checked = autoSave;
+    }
+
+    // Save settings
+    document.getElementById('darkModeToggle').addEventListener('change', function () {
+        localStorage.setItem('darkMode', this.checked);
+        showToast('Pengaturan mode gelap disimpan', 'success');
+        // Implement dark mode toggle here
+    });
+
+    document.getElementById('notificationToggle').addEventListener('change', function () {
+        localStorage.setItem('notifications', this.checked);
+        showToast('Pengaturan notifikasi disimpan', 'success');
+    });
+
+    document.getElementById('autoSaveToggle').addEventListener('change', function () {
+        localStorage.setItem('autoSave', this.checked);
+        showToast('Pengaturan auto-save disimpan', 'success');
+    });
+
+    function exportAllData() {
+        const history = getPredictionHistory();
+        if (history.length === 0) {
+            showToast('Tidak ada data untuk diexport', 'warning');
+            return;
+        }
+
+        const dataStr = JSON.stringify(history, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `npl_predictions_${new Date().toISOString().split('T')[0]}.json`;
+        link.click();
+
+        showToast('Data berhasil diexport', 'success');
+    }
+
+    function clearCache() {
+        if (confirm('Apakah Anda yakin ingin membersihkan cache? Data riwayat tidak akan terhapus.')) {
+            // Clear cache except prediction history
+            const history = localStorage.getItem('predictionHistory');
+            localStorage.clear();
+            if (history) {
+                localStorage.setItem('predictionHistory', history);
+            }
+            showToast('Cache berhasil dibersihkan', 'success');
+        }
+    }
+
+    function resetSettings() {
+        if (confirm('Apakah Anda yakin ingin mereset semua pengaturan ke default?')) {
+            localStorage.removeItem('darkMode');
+            localStorage.removeItem('notifications');
+            localStorage.removeItem('autoSave');
+            loadSettings();
+            showToast('Pengaturan direset ke default', 'success');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadSettings);
+</script>
+{% endblock %}

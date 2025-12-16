@@ -1,0 +1,468 @@
+{% extends "base.html" %}
+
+{% block title %}Riwayat Prediksi - Sistem Prediksi Kredit{% endblock %}
+
+{% block content %}
+<div class="space-y-6 fade-in">
+    <!-- Page Header -->
+    <div class="card-android material-shadow p-6">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+            <div class="flex items-center space-x-3">
+                <div class="bg-primary p-3 rounded-lg">
+                    <i class="fas fa-history text-white text-2xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Riwayat Prediksi</h2>
+                    <p class="text-gray-500">Lihat semua prediksi yang pernah dilakukan</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button onclick="exportToCSV()"
+                    class="px-4 py-2 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 transition-colors flex items-center space-x-2">
+                    <i class="fas fa-download"></i>
+                    <span>Export CSV</span>
+                </button>
+                <button onclick="clearAllHistory()"
+                    class="px-4 py-2 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition-colors flex items-center space-x-2">
+                    <i class="fas fa-trash"></i>
+                    <span>Hapus Semua</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter and Search -->
+    <div class="card-android material-shadow p-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="md:col-span-2">
+                <div class="relative">
+                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" id="searchInput" placeholder="Cari berdasarkan pekerjaan, produk..."
+                        class="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary transition-all"
+                        oninput="filterHistory()">
+                </div>
+            </div>
+            <div>
+                <select id="filterStatus" onchange="filterHistory()"
+                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary transition-all">
+                    <option value="">Semua Status</option>
+                    <option value="Lancar">Lancar</option>
+                    <option value="Tidak Lancar">Tidak Lancar</option>
+                </select>
+            </div>
+            <div>
+                <select id="filterSort" onchange="filterHistory()"
+                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary transition-all">
+                    <option value="newest">Terbaru</option>
+                    <option value="oldest">Terlama</option>
+                    <option value="highest_risk">Risiko Tertinggi</option>
+                    <option value="lowest_risk">Risiko Terendah</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Summary -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="card-android material-shadow p-6 text-center">
+            <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-list text-blue-600 text-2xl"></i>
+            </div>
+            <p class="text-3xl font-bold text-gray-800" id="statTotal">0</p>
+            <p class="text-gray-500 text-sm">Total Prediksi</p>
+        </div>
+        <div class="card-android material-shadow p-6 text-center">
+            <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-check text-green-600 text-2xl"></i>
+            </div>
+            <p class="text-3xl font-bold text-green-600" id="statLancar">0</p>
+            <p class="text-gray-500 text-sm">Kredit Lancar</p>
+        </div>
+        <div class="card-android material-shadow p-6 text-center">
+            <div class="bg-red-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-times text-red-600 text-2xl"></i>
+            </div>
+            <p class="text-3xl font-bold text-red-600" id="statMacet">0</p>
+            <p class="text-gray-500 text-sm">Kredit Macet</p>
+        </div>
+        <div class="card-android material-shadow p-6 text-center">
+            <div class="bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-percentage text-orange-600 text-2xl"></i>
+            </div>
+            <p class="text-3xl font-bold text-orange-600" id="statRatio">0%</p>
+            <p class="text-gray-500 text-sm">Rasio Lancar</p>
+        </div>
+    </div>
+
+    <!-- History List -->
+    <div class="card-android material-shadow p-6">
+        <div id="historyList" class="space-y-4">
+            <!-- Will be populated by JavaScript -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="text-center py-16" style="display: none;">
+            <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
+            <h3 class="text-xl font-bold text-gray-600 mb-2">Belum Ada Riwayat</h3>
+            <p class="text-gray-500 mb-6">Mulai dengan membuat prediksi baru</p>
+            <a href="/predict"
+                class="inline-flex items-center space-x-2 px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primaryDark transition-colors">
+                <i class="fas fa-plus"></i>
+                <span>Buat Prediksi</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Detail Modal -->
+<div id="detailModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto material-shadow-lg fade-in">
+        <div class="sticky top-0 bg-gradient-to-r from-primary to-purple-600 text-white p-6 rounded-t-2xl">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-file-alt text-3xl"></i>
+                    <div>
+                        <h3 class="text-2xl font-bold">Detail Prediksi</h3>
+                        <p class="text-purple-200 text-sm" id="detailTimestamp"></p>
+                    </div>
+                </div>
+                <button onclick="closeDetailModal()"
+                    class="text-white hover:bg-white/20 p-2 rounded-full transition-colors">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="detailContent" class="p-6">
+            <!-- Will be filled by JavaScript -->
+        </div>
+
+        <div class="border-t p-6 bg-gray-50 rounded-b-2xl flex space-x-3">
+            <button onclick="closeDetailModal()"
+                class="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-colors">
+                <i class="fas fa-times mr-2"></i> Tutup
+            </button>
+            <button onclick="printDetail()"
+                class="flex-1 px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition-colors">
+                <i class="fas fa-print mr-2"></i> Cetak
+            </button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let allHistory = [];
+    let filteredHistory = [];
+
+    function loadHistory() {
+        allHistory = getPredictionHistory();
+        filteredHistory = [...allHistory];
+
+        updateStatistics();
+        displayHistory();
+    }
+
+    function updateStatistics() {
+        const total = allHistory.length;
+        const lancar = allHistory.filter(p => p.prediction === 'Lancar').length;
+        const macet = allHistory.filter(p => p.prediction === 'Tidak Lancar').length;
+        const ratio = total > 0 ? ((lancar / total) * 100).toFixed(1) : 0;
+
+        document.getElementById('statTotal').textContent = total;
+        document.getElementById('statLancar').textContent = lancar;
+        document.getElementById('statMacet').textContent = macet;
+        document.getElementById('statRatio').textContent = ratio + '%';
+    }
+
+    function displayHistory() {
+        const container = document.getElementById('historyList');
+        const emptyState = document.getElementById('emptyState');
+
+        if (filteredHistory.length === 0) {
+            container.innerHTML = '';
+            emptyState.style.display = 'block';
+            return;
+        }
+
+        emptyState.style.display = 'none';
+
+        container.innerHTML = filteredHistory.map((item, index) => {
+            const riskColorMap = {
+                'green': { bg: 'bg-green-50', text: 'text-green-700', badge: 'bg-green-100 text-green-800' },
+                'blue': { bg: 'bg-blue-50', text: 'text-blue-700', badge: 'bg-blue-100 text-blue-800' },
+                'yellow': { bg: 'bg-yellow-50', text: 'text-yellow-700', badge: 'bg-yellow-100 text-yellow-800' },
+                'orange': { bg: 'bg-orange-50', text: 'text-orange-700', badge: 'bg-orange-100 text-orange-800' },
+                'red': { bg: 'bg-red-50', text: 'text-red-700', badge: 'bg-red-100 text-red-800' }
+            };
+
+            const colors = riskColorMap[item.risk_color] || riskColorMap['blue'];
+            const statusColor = item.prediction === 'Lancar' ? 'bg-green-500' : 'bg-red-500';
+
+            return `
+                <div class="border-2 border-gray-200 rounded-xl p-6 hover:border-primary transition-all cursor-pointer ${colors.bg}"
+                    onclick="showDetail(${index})">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+                        <div class="flex items-start space-x-4 flex-1">
+                            <div class="${statusColor} p-4 rounded-xl text-white">
+                                <i class="fas fa-${item.prediction === 'Lancar' ? 'check' : 'exclamation-triangle'} text-2xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <h3 class="font-bold text-lg text-gray-800">${item.input_summary.pekerjaan}</h3>
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold ${item.prediction === 'Lancar' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                        ${item.prediction}
+                                    </span>
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold ${colors.badge}">
+                                        ${item.risk_level}
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2 text-sm text-gray-600 mb-2">
+                                    <div><i class="fas fa-user w-4"></i> ${item.input_summary.usia} tahun</div>
+                                    <div><i class="fas fa-heart w-4"></i> ${item.input_summary.status_pernikahan}</div>
+                                    <div><i class="fas fa-money-bill-wave w-4"></i> ${item.input_summary.plafond}</div>
+                                    <div><i class="fas fa-calendar w-4"></i> ${item.input_summary.jangka_waktu}</div>
+                                </div>
+                                <div class="text-xs text-gray-500">
+                                    <i class="fas fa-clock mr-1"></i> ${formatDate(item.timestamp)}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-6">
+                            <div class="text-center">
+                                <p class="text-sm text-gray-500 mb-1">Prob. Lancar</p>
+                                <div class="relative inline-block">
+                                    <svg class="transform -rotate-90 w-20 h-20">
+                                        <circle cx="40" cy="40" r="32" stroke="#e5e7eb" stroke-width="6" fill="none" />
+                                        <circle cx="40" cy="40" r="32" stroke="#10b981" stroke-width="6" fill="none"
+                                            stroke-dasharray="${(item.probability.lancar * 2.01).toFixed(2)} 201"
+                                            stroke-linecap="round" />
+                                    </svg>
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <span class="text-sm font-bold text-green-600">${item.probability.lancar}%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col space-y-2">
+                                <button onclick="event.stopPropagation(); deleteHistory(${index})" 
+                                    class="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <button onclick="event.stopPropagation(); showDetail(${index})" 
+                                    class="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function filterHistory() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const statusFilter = document.getElementById('filterStatus').value;
+        const sortBy = document.getElementById('filterSort').value;
+
+        // Filter
+        filteredHistory = allHistory.filter(item => {
+            const matchSearch = !searchTerm ||
+                item.input_summary.pekerjaan.toLowerCase().includes(searchTerm) ||
+                item.input_summary.produk.toLowerCase().includes(searchTerm) ||
+                item.input_summary.sub_produk.toLowerCase().includes(searchTerm);
+
+            const matchStatus = !statusFilter || item.prediction === statusFilter;
+
+            return matchSearch && matchStatus;
+        });
+
+        // Sort
+        filteredHistory.sort((a, b) => {
+            switch (sortBy) {
+                case 'newest':
+                    return new Date(b.timestamp) - new Date(a.timestamp);
+                case 'oldest':
+                    return new Date(a.timestamp) - new Date(b.timestamp);
+                case 'highest_risk':
+                    return b.probability.tidak_lancar - a.probability.tidak_lancar;
+                case 'lowest_risk':
+                    return a.probability.tidak_lancar - b.probability.tidak_lancar;
+                default:
+                    return 0;
+            }
+        });
+
+        displayHistory();
+    }
+
+    function showDetail(index) {
+        const item = filteredHistory[index];
+        const riskColorMap = {
+            'green': { bg: 'bg-green-100', text: 'text-green-800', border: 'border-green-300' },
+            'blue': { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-300' },
+            'yellow': { bg: 'bg-yellow-100', text: 'text-yellow-800', border: 'border-yellow-300' },
+            'orange': { bg: 'bg-orange-100', text: 'text-orange-800', border: 'border-orange-300' },
+            'red': { bg: 'bg-red-100', text: 'text-red-800', border: 'border-red-300' }
+        };
+
+        const colors = riskColorMap[item.risk_color];
+        const statusColor = item.prediction === 'Lancar' ? 'green' : 'red';
+
+        document.getElementById('detailTimestamp').textContent = formatDate(item.timestamp);
+
+        const html = `
+            <div class="space-y-6">
+                <div class="text-center p-8 bg-gradient-to-br from-${statusColor}-50 to-${statusColor}-100 rounded-xl border-2 border-${statusColor}-300">
+                    <i class="fas fa-${item.prediction === 'Lancar' ? 'check-circle' : 'exclamation-triangle'} text-${statusColor}-600 text-6xl mb-4"></i>
+                    <h3 class="text-4xl font-bold text-${statusColor}-800 mb-2">${item.prediction}</h3>
+                    <p class="text-${statusColor}-600 font-medium">Status Prediksi Kredit</p>
+                </div>
+                
+                <div class="border-2 rounded-xl p-6 ${colors.bg} ${colors.border}">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium ${colors.text} mb-1">Tingkat Risiko</p>
+                            <p class="text-3xl font-bold ${colors.text}">${item.risk_level}</p>
+                        </div>
+                        <i class="fas fa-shield-alt text-5xl ${colors.text}"></i>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="border rounded-xl p-4 text-center">
+                        <p class="text-sm text-gray-500 mb-2">Probabilitas Lancar</p>
+                        <p class="text-3xl font-bold text-green-600">${item.probability.lancar}%</p>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                            <div class="bg-green-500 h-2 rounded-full" style="width: ${item.probability.lancar}%"></div>
+                        </div>
+                    </div>
+                    <div class="border rounded-xl p-4 text-center">
+                        <p class="text-sm text-gray-500 mb-2">Probabilitas Macet</p>
+                        <p class="text-3xl font-bold text-red-600">${item.probability.tidak_lancar}%</p>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                            <div class="bg-red-500 h-2 rounded-full" style="width: ${item.probability.tidak_lancar}%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 border-2 border-blue-200 rounded-xl p-6">
+                    <h4 class="font-bold text-blue-900 mb-3 flex items-center">
+                        <i class="fas fa-lightbulb mr-2"></i> Rekomendasi
+                    </h4>
+                    <p class="text-gray-700">${item.rekomendasi}</p>
+                </div>
+                
+                <div class="border rounded-xl p-6">
+                    <h4 class="font-bold text-gray-800 mb-4">Detail Data Pemohon</h4>
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div class="flex justify-between py-2 border-b">
+                            <span class="text-gray-600">Usia</span>
+                            <span class="font-semibold">${item.input_summary.usia} tahun</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b">
+                            <span class="text-gray-600">Status Pernikahan</span>
+                            <span class="font-semibold">${item.input_summary.status_pernikahan}</span>
+                        </div>
+                        <div class="col-span-2 flex justify-between py-2 border-b">
+                            <span class="text-gray-600">Pekerjaan</span>
+                            <span class="font-semibold">${item.input_summary.pekerjaan}</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b">
+                            <span class="text-gray-600">Plafond</span>
+                            <span class="font-semibold">${item.input_summary.plafond}</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b">
+                            <span class="text-gray-600">Jangka Waktu</span>
+                            <span class="font-semibold">${item.input_summary.jangka_waktu}</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b">
+                            <span class="text-gray-600">Produk</span>
+                            <span class="font-semibold">${item.input_summary.produk}</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b">
+                            <span class="text-gray-600">Sub Produk</span>
+                            <span class="font-semibold">${item.input_summary.sub_produk}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('detailContent').innerHTML = html;
+        document.getElementById('detailModal').classList.remove('hidden');
+        document.getElementById('detailModal').classList.add('flex');
+    }
+
+    function closeDetailModal() {
+        document.getElementById('detailModal').classList.add('hidden');
+        document.getElementById('detailModal').classList.remove('flex');
+    }
+
+    function printDetail() {
+        window.print();
+    }
+
+    function deleteHistory(index) {
+        if (confirm('Apakah Anda yakin ingin menghapus riwayat ini?')) {
+            const itemId = filteredHistory[index].id;
+            allHistory = allHistory.filter(item => item.id !== itemId);
+            localStorage.setItem('predictionHistory', JSON.stringify(allHistory));
+
+            loadHistory();
+            filterHistory();
+            showToast('Riwayat berhasil dihapus', 'success');
+        }
+    }
+
+    function clearAllHistory() {
+        if (confirm('Apakah Anda yakin ingin menghapus SEMUA riwayat prediksi?')) {
+            localStorage.removeItem('predictionHistory');
+            loadHistory();
+            filterHistory();
+            showToast('Semua riwayat berhasil dihapus', 'success');
+        }
+    }
+
+    function exportToCSV() {
+        if (allHistory.length === 0) {
+            showToast('Tidak ada data untuk diekspor', 'warning');
+            return;
+        }
+
+        const headers = ['Timestamp', 'Prediksi', 'Risiko', 'Prob_Lancar', 'Prob_Macet', 'Usia', 'Pekerjaan', 'Status', 'Plafond', 'Tenor', 'Produk', 'Sub_Produk'];
+        const csvContent = [
+            headers.join(','),
+            ...allHistory.map(item => [
+                item.timestamp,
+                item.prediction,
+                item.risk_level,
+                item.probability.lancar,
+                item.probability.tidak_lancar,
+                item.input_summary.usia,
+                `"${item.input_summary.pekerjaan}"`,
+                item.input_summary.status_pernikahan,
+                item.input_summary.plafond.replace(/[^0-9]/g, ''),
+                item.input_summary.jangka_waktu.replace(/[^0-9]/g, ''),
+                item.input_summary.produk,
+                item.input_summary.sub_produk
+            ].join(','))
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `riwayat_prediksi_${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
+
+        showToast('Data berhasil diekspor', 'success');
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function () {
+        loadHistory();
+    });
+</script>
+{% endblock %}

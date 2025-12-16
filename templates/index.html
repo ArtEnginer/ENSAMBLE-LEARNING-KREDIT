@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Prediksi Kredit NPL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#8b5cf6',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="gradient-bg shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-white p-3 rounded-lg shadow-md">
+                        <i class="fas fa-chart-line text-2xl text-purple-600"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold text-white">Sistem Prediksi Kredit</h1>
+                        <p class="text-purple-100 text-sm">Analisis NPL dengan Machine Learning</p>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg">
+                    <i class="fas fa-robot text-white"></i>
+                    <span class="text-white font-semibold">{{ metadata.model_name }}</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Model Info Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 fade-in">
+            <div
+                class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500 transform hover:scale-105 transition-transform">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">Akurasi Model</p>
+                        <p class="text-3xl font-bold text-blue-600">{{ (metadata.accuracy * 100)|round(1) }}%</p>
+                    </div>
+                    <div class="bg-blue-100 p-3 rounded-full">
+                        <i class="fas fa-bullseye text-blue-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500 transform hover:scale-105 transition-transform">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">Precision</p>
+                        <p class="text-3xl font-bold text-green-600">{{ (metadata.precision * 100)|round(1) }}%</p>
+                    </div>
+                    <div class="bg-green-100 p-3 rounded-full">
+                        <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500 transform hover:scale-105 transition-transform">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">Recall</p>
+                        <p class="text-3xl font-bold text-purple-600">{{ (metadata.recall * 100)|round(1) }}%</p>
+                    </div>
+                    <div class="bg-purple-100 p-3 rounded-full">
+                        <i class="fas fa-search text-purple-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-orange-500 transform hover:scale-105 transition-transform">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">F1-Score</p>
+                        <p class="text-3xl font-bold text-orange-600">{{ (metadata.f1_score * 100)|round(1) }}%</p>
+                    </div>
+                    <div class="bg-orange-100 p-3 rounded-full">
+                        <i class="fas fa-star text-orange-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Form Input -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-xl p-6 md:p-8 fade-in">
+                    <div class="flex items-center space-x-3 mb-6 pb-4 border-b-2 border-gray-200">
+                        <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-3 rounded-lg">
+                            <i class="fas fa-file-alt text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800">Form Pengajuan Kredit</h2>
+                            <p class="text-gray-500 text-sm">Lengkapi data pemohon kredit</p>
+                        </div>
+                    </div>
+
+                    <form id="predictionForm" class="space-y-6">
+                        <!-- Data Pribadi -->
+                        <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                                <i class="fas fa-user mr-2 text-blue-600"></i>
+                                Data Pribadi
+                            </h3>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i class="fas fa-birthday-cake mr-1"></i> Tanggal Lahir
+                                    </label>
+                                    <input type="date" name="tanggal_lahir" id="tanggal_lahir" required
+                                        class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i class="fas fa-briefcase mr-1"></i> Pekerjaan
+                                    </label>
+                                    <select name="pekerjaan" id="pekerjaan" required
+                                        class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all">
+                                        <option value="">Pilih Pekerjaan</option>
+                                        {% for value, label in pekerjaan_options.items() %}
+                                        <option value="{{ value }}">{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i class="fas fa-heart mr-1"></i> Status Pernikahan
+                                    </label>
+                                    <select name="status_pernikahan" id="status_pernikahan" required
+                                        class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all">
+                                        <option value="">Pilih Status</option>
+                                        {% for value, label in status_pernikahan_options.items() %}
+                                        <option value="{{ value }}">{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Data Kredit -->
+                        <div class="bg-gradient-to-r from-green-50 to-teal-50 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                                <i class="fas fa-credit-card mr-2 text-green-600"></i>
+                                Informasi Kredit
+                            </h3>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i class="fas fa-money-bill-wave mr-1"></i> Plafond (Rp)
+                                    </label>
+                                    <input type="number" name="plafond" id="plafond" required min="0" step="1000000"
+                                        placeholder="Contoh: 100000000"
+                                        class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i class="fas fa-calendar-alt mr-1"></i> Jangka Waktu (bulan)
+                                    </label>
+                                    <input type="number" name="jangka_waktu" id="jangka_waktu" required min="1"
+                                        max="360" placeholder="Contoh: 60"
+                                        class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i class="fas fa-box mr-1"></i> Produk
+                                    </label>
+                                    <select name="produk" id="produk" required
+                                        class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all">
+                                        <option value="">Pilih Produk</option>
+                                        {% for produk in produk_options %}
+                                        <option value="{{ produk }}">{{ produk }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i class="fas fa-cubes mr-1"></i> Sub Produk
+                                    </label>
+                                    <select name="sub_produk" id="sub_produk" required
+                                        class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all">
+                                        <option value="">Pilih Sub Produk</option>
+                                        {% for sub_produk in sub_produk_options %}
+                                        <option value="{{ sub_produk }}">{{ sub_produk }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Data Prescreening -->
+                        <div class="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                                <i class="fas fa-clipboard-check mr-2 text-purple-600"></i>
+                                Hasil Prescreening
+                            </h3>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i class="fas fa-check-double mr-1"></i> Hasil Prescreening
+                                    </label>
+                                    <select name="hasil_prescreening" id="hasil_prescreening" required
+                                        class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all">
+                                        <option value="">Pilih Status</option>
+                                        {% for status in hasil_prescreening_options %}
+                                        <option value="{{ status }}">{{ status }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i class="fas fa-chart-bar mr-1"></i> SLIK
+                                    </label>
+                                    <select name="hasil_prescreening_slik" id="hasil_prescreening_slik" required
+                                        class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all">
+                                        <option value="">Pilih Hasil SLIK</option>
+                                        {% for status in hasil_prescreening_slik_options %}
+                                        <option value="{{ status }}">{{ status }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i class="fas fa-id-card mr-1"></i> SIPKUR
+                                    </label>
+                                    <select name="hasil_prescreening_sipkur" id="hasil_prescreening_sipkur" required
+                                        class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all">
+                                        <option value="">Pilih Hasil SIPKUR</option>
+                                        {% for status in hasil_prescreening_sipkur_options %}
+                                        <option value="{{ status }}">{{ status }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i class="fas fa-address-card mr-1"></i> Dukcapil
+                                    </label>
+                                    <select name="hasil_prescreening_dukcapil" id="hasil_prescreening_dukcapil" required
+                                        class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all">
+                                        <option value="">Pilih Hasil Dukcapil</option>
+                                        {% for status in hasil_prescreening_dukcapil_options %}
+                                        <option value="{{ status }}">{{ status }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i class="fas fa-tasks mr-1"></i> Status Aplikasi
+                                    </label>
+                                    <select name="status_aplikasi" id="status_aplikasi" required
+                                        class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all">
+                                        <option value="">Pilih Status Aplikasi</option>
+                                        {% for status in status_aplikasi_options %}
+                                        <option value="{{ status }}">{{ status }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="flex justify-end space-x-4 pt-4">
+                            <button type="reset"
+                                class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-colors flex items-center space-x-2">
+                                <i class="fas fa-redo"></i>
+                                <span>Reset</span>
+                            </button>
+                            <button type="submit" id="submitBtn"
+                                class="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg flex items-center space-x-2">
+                                <i class="fas fa-calculator"></i>
+                                <span>Analisis Kredit</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Result Section -->
+            <div class="lg:col-span-1">
+                <div id="resultSection" class="bg-white rounded-xl shadow-xl p-6 sticky top-8 hidden">
+                    <div class="flex items-center space-x-3 mb-6 pb-4 border-b-2 border-gray-200">
+                        <div class="bg-gradient-to-r from-green-500 to-teal-600 p-3 rounded-lg">
+                            <i class="fas fa-chart-pie text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-800">Hasil Analisis</h2>
+                            <p class="text-gray-500 text-sm">Prediksi Kredit</p>
+                        </div>
+                    </div>
+
+                    <div id="resultContent"></div>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loadingSection" class="bg-white rounded-xl shadow-xl p-6 sticky top-8 hidden">
+                    <div class="flex flex-col items-center justify-center py-12">
+                        <div class="loading-spinner mb-4"></div>
+                        <p class="text-gray-600 font-medium">Menganalisis data...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-16 py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-gray-300">
+                <i class="fas fa-copyright"></i> 2025 Sistem Prediksi Kredit NPL |
+                Powered by <span class="font-bold text-blue-400">{{ metadata.model_name }}</span>
+            </p>
+            <p class="text-gray-400 text-sm mt-2">
+                Machine Learning Model for Credit Risk Assessment
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('predictionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Get form data
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+
+            // Show loading
+            document.getElementById('resultSection').classList.add('hidden');
+            document.getElementById('loadingSection').classList.remove('hidden');
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    displayResult(result);
+                } else {
+                    displayError(result.message);
+                }
+            } catch (error) {
+                displayError('Terjadi kesalahan saat memproses data: ' + error.message);
+            } finally {
+                document.getElementById('loadingSection').classList.add('hidden');
+            }
+        });
+
+        function displayResult(result) {
+            const riskColors = {
+                'green': 'bg-green-100 text-green-800 border-green-300',
+                'blue': 'bg-blue-100 text-blue-800 border-blue-300',
+                'yellow': 'bg-yellow-100 text-yellow-800 border-yellow-300',
+                'orange': 'bg-orange-100 text-orange-800 border-orange-300',
+                'red': 'bg-red-100 text-red-800 border-red-300'
+            };
+
+            const predictionColor = result.prediction === 'Lancar' ? 'text-green-600' : 'text-red-600';
+            const predictionBg = result.prediction === 'Lancar' ? 'bg-green-50' : 'bg-red-50';
+            const predictionIcon = result.prediction === 'Lancar' ? 'check-circle' : 'exclamation-circle';
+
+            const html = `
+                <div class="space-y-4 fade-in">
+                    <!-- Prediction -->
+                    <div class="${predictionBg} p-6 rounded-lg border-2 ${result.prediction === 'Lancar' ? 'border-green-300' : 'border-red-300'}">
+                        <div class="flex items-center justify-center mb-4">
+                            <i class="fas fa-${predictionIcon} text-5xl ${predictionColor}"></i>
+                        </div>
+                        <h3 class="text-center text-2xl font-bold ${predictionColor} mb-2">
+                            ${result.prediction}
+                        </h3>
+                        <p class="text-center text-gray-600 text-sm">Status Prediksi Kredit</p>
+                    </div>
+                    
+                    <!-- Risk Level -->
+                    <div class="border-2 rounded-lg p-4 ${riskColors[result.risk_color]}">
+                        <p class="text-sm font-medium text-center mb-1">Tingkat Risiko</p>
+                        <p class="text-xl font-bold text-center">${result.risk_level}</p>
+                    </div>
+                    
+                    <!-- Probability -->
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <h4 class="text-sm font-semibold text-gray-700 mb-3">Probabilitas</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-600">Lancar</span>
+                                    <span class="font-semibold text-green-600">${result.probability.lancar}%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-green-500 h-2 rounded-full transition-all" style="width: ${result.probability.lancar}%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-600">Tidak Lancar</span>
+                                    <span class="font-semibold text-red-600">${result.probability.tidak_lancar}%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-red-500 h-2 rounded-full transition-all" style="width: ${result.probability.tidak_lancar}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recommendation -->
+                    <div class="bg-blue-50 p-4 rounded-lg border-2 border-blue-200">
+                        <h4 class="text-sm font-semibold text-blue-900 mb-2">
+                            <i class="fas fa-lightbulb mr-1"></i> Rekomendasi
+                        </h4>
+                        <p class="text-sm text-gray-700">${result.rekomendasi}</p>
+                    </div>
+                    
+                    <!-- Summary -->
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <h4 class="text-sm font-semibold text-gray-700 mb-3">Ringkasan Data</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Usia:</span>
+                                <span class="font-medium">${result.input_summary.usia} tahun</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Pekerjaan:</span>
+                                <span class="font-medium text-right">${result.input_summary.pekerjaan}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Plafond:</span>
+                                <span class="font-medium">${result.input_summary.plafond}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Tenor:</span>
+                                <span class="font-medium">${result.input_summary.jangka_waktu}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('resultContent').innerHTML = html;
+            document.getElementById('resultSection').classList.remove('hidden');
+
+            // Smooth scroll to result on mobile
+            if (window.innerWidth < 1024) {
+                document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function displayError(message) {
+            const html = `
+                <div class="bg-red-50 border-2 border-red-200 rounded-lg p-4">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-exclamation-triangle text-red-600 text-2xl mr-3"></i>
+                        <h4 class="text-red-800 font-semibold">Error</h4>
+                    </div>
+                    <p class="text-sm text-red-700">${message}</p>
+                </div>
+            `;
+            document.getElementById('resultContent').innerHTML = html;
+            document.getElementById('resultSection').classList.remove('hidden');
+        }
+
+        // Format Rupiah on input
+        document.getElementById('plafond').addEventListener('input', function (e) {
+            let value = e.target.value.replace(/[^0-9]/g, '');
+            e.target.value = value;
+        });
+    </script>
+</body>
+
+</html>
