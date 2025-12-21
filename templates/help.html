@@ -5,14 +5,16 @@
 {% block content %}
 <div class="space-y-6 fade-in max-w-5xl">
     <!-- Page Header -->
-    <div class="card-android material-shadow p-6 bg-gradient-to-r from-primary to-purple-600 text-white">
-        <div class="flex items-center space-x-3">
-            <div class="bg-white p-3 rounded-lg">
-                <i class="fas fa-question-circle text-primary text-2xl"></i>
+    <div class="card-android material-shadow p-6 relative overflow-hidden text-white">
+        <div class="absolute inset-0 bg-blue-600 opacity-90"></div>
+        <div class="absolute inset-0 backdrop-blur-xl"></div>
+        <div class="relative flex items-center space-x-3">
+            <div class="bg-white/90 backdrop-blur-sm p-3 rounded-lg">
+                <i class="fas fa-question-circle text-blue-600 text-2xl"></i>
             </div>
             <div>
                 <h2 class="text-2xl font-bold">Pusat Bantuan</h2>
-                <p class="text-purple-100">Panduan lengkap penggunaan sistem prediksi kredit</p>
+                <p class="text-blue-100">Panduan lengkap penggunaan sistem prediksi kredit</p>
             </div>
         </div>
     </div>
@@ -24,26 +26,35 @@
             Panduan Cepat
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border-2 border-blue-200">
-                <div class="bg-blue-500 w-12 h-12 rounded-full flex items-center justify-center mb-4">
-                    <span class="text-white font-bold text-xl">1</span>
+            <div class="relative p-6 rounded-xl border-2 border-blue-200 overflow-hidden">
+                <div class="absolute inset-0 bg-blue-50/80 backdrop-blur-sm"></div>
+                <div class="relative">
+                    <div class="bg-blue-500 w-12 h-12 rounded-full flex items-center justify-center mb-4">
+                        <span class="text-white font-bold text-xl">1</span>
+                    </div>
+                    <h4 class="font-bold text-blue-900 mb-2">Isi Form Prediksi</h4>
+                    <p class="text-sm text-blue-700">Masukkan data pemohon kredit di halaman prediksi</p>
                 </div>
-                <h4 class="font-bold text-blue-900 mb-2">Isi Form Prediksi</h4>
-                <p class="text-sm text-blue-700">Masukkan data pemohon kredit di halaman prediksi</p>
             </div>
-            <div class="p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-xl border-2 border-green-200">
-                <div class="bg-green-500 w-12 h-12 rounded-full flex items-center justify-center mb-4">
-                    <span class="text-white font-bold text-xl">2</span>
+            <div class="relative p-6 rounded-xl border-2 border-green-200 overflow-hidden">
+                <div class="absolute inset-0 bg-green-50/80 backdrop-blur-sm"></div>
+                <div class="relative">
+                    <div class="bg-green-500 w-12 h-12 rounded-full flex items-center justify-center mb-4">
+                        <span class="text-white font-bold text-xl">2</span>
+                    </div>
+                    <h4 class="font-bold text-green-900 mb-2">Dapatkan Hasil</h4>
+                    <p class="text-sm text-green-700">Sistem akan menganalisis dan memberikan prediksi</p>
                 </div>
-                <h4 class="font-bold text-green-900 mb-2">Dapatkan Hasil</h4>
-                <p class="text-sm text-green-700">Sistem akan menganalisis dan memberikan prediksi</p>
             </div>
-            <div class="p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border-2 border-purple-200">
-                <div class="bg-purple-500 w-12 h-12 rounded-full flex items-center justify-center mb-4">
-                    <span class="text-white font-bold text-xl">3</span>
+            <div class="relative p-6 rounded-xl border-2 border-purple-200 overflow-hidden">
+                <div class="absolute inset-0 bg-purple-50/80 backdrop-blur-sm"></div>
+                <div class="relative">
+                    <div class="bg-purple-500 w-12 h-12 rounded-full flex items-center justify-center mb-4">
+                        <span class="text-white font-bold text-xl">3</span>
+                    </div>
+                    <h4 class="font-bold text-purple-900 mb-2">Analisis Data</h4>
+                    <p class="text-sm text-purple-700">Lihat riwayat dan analitik di dashboard</p>
                 </div>
-                <h4 class="font-bold text-purple-900 mb-2">Analisis Data</h4>
-                <p class="text-sm text-purple-700">Lihat riwayat dan analitik di dashboard</p>
             </div>
         </div>
     </div>
@@ -246,28 +257,32 @@
     </div>
 
     <!-- Contact Support -->
-    <div class="card-android material-shadow p-6 bg-gradient-to-br from-primary to-purple-600 text-white">
-        <h3 class="text-xl font-bold mb-4 flex items-center">
-            <i class="fas fa-headset mr-2"></i>
-            Butuh Bantuan Lebih Lanjut?
-        </h3>
-        <p class="text-purple-100 mb-6">Jika Anda memiliki pertanyaan atau mengalami masalah, jangan ragu untuk
-            menghubungi kami.</p>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-white/10 backdrop-blur-sm p-4 rounded-lg">
-                <i class="fas fa-envelope text-2xl mb-2"></i>
-                <p class="text-sm font-semibold">Email</p>
-                <p class="text-xs text-purple-200">support@nplpredictor.com</p>
-            </div>
-            <div class="bg-white/10 backdrop-blur-sm p-4 rounded-lg">
-                <i class="fas fa-phone text-2xl mb-2"></i>
-                <p class="text-sm font-semibold">Telepon</p>
-                <p class="text-xs text-purple-200">+62 xxx-xxxx-xxxx</p>
-            </div>
-            <div class="bg-white/10 backdrop-blur-sm p-4 rounded-lg">
-                <i class="fas fa-comments text-2xl mb-2"></i>
-                <p class="text-sm font-semibold">Live Chat</p>
-                <p class="text-xs text-purple-200">Senin - Jumat, 09:00-17:00</p>
+    <div class="card-android material-shadow p-6 relative overflow-hidden text-white">
+        <div class="absolute inset-0 bg-blue-600 opacity-90"></div>
+        <div class="absolute inset-0 backdrop-blur-xl"></div>
+        <div class="relative">
+            <h3 class="text-xl font-bold mb-4 flex items-center">
+                <i class="fas fa-headset mr-2"></i>
+                Butuh Bantuan Lebih Lanjut?
+            </h3>
+            <p class="text-blue-100 mb-6">Jika Anda memiliki pertanyaan atau mengalami masalah, jangan ragu untuk
+                menghubungi kami.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white/10 backdrop-blur-sm p-4 rounded-lg border border-white/20">
+                    <i class="fas fa-envelope text-2xl mb-2"></i>
+                    <p class="text-sm font-semibold">Email</p>
+                    <p class="text-xs text-blue-200">support@nplpredictor.com</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm p-4 rounded-lg border border-white/20">
+                    <i class="fas fa-phone text-2xl mb-2"></i>
+                    <p class="text-sm font-semibold">Telepon</p>
+                    <p class="text-xs text-blue-200">+62 xxx-xxxx-xxxx</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm p-4 rounded-lg border border-white/20">
+                    <i class="fas fa-comments text-2xl mb-2"></i>
+                    <p class="text-sm font-semibold">Live Chat</p>
+                    <p class="text-xs text-blue-200">Senin - Jumat, 09:00-17:00</p>
+                </div>
             </div>
         </div>
     </div>

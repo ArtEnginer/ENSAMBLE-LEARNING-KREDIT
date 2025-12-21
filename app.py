@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 # Load model and preprocessors
 MODEL_DIR = "models"
-METADATA_FILE = os.path.join(MODEL_DIR, "model_metadata_20251216_103357.json")
+METADATA_FILE = os.path.join(MODEL_DIR, "model_metadata_20251221_100403.json")
 
 # Load metadata
 with open(METADATA_FILE, "r") as f:
@@ -17,18 +17,19 @@ with open(METADATA_FILE, "r") as f:
 
 # Load model dan preprocessors
 model = joblib.load(
-    os.path.join(MODEL_DIR, "best_model_lightgbm_20251216_103357.joblib")
+    os.path.join(MODEL_DIR, "best_model_lightgbm_20251221_100403.joblib")
 )
 label_encoders = joblib.load(
-    os.path.join(MODEL_DIR, "label_encoders_20251216_103357.joblib")
+    os.path.join(MODEL_DIR, "label_encoders_20251221_100403.joblib")
 )
 target_encoder = joblib.load(
-    os.path.join(MODEL_DIR, "target_encoder_20251216_103357.joblib")
+    os.path.join(MODEL_DIR, "target_encoder_20251221_100403.joblib")
 )
-scaler = joblib.load(os.path.join(MODEL_DIR, "scaler_20251216_103357.joblib"))
+scaler = joblib.load(os.path.join(MODEL_DIR, "scaler_20251221_100403.joblib"))
 
 # Load dataset untuk mendapatkan unique values untuk dropdown
-df = pd.read_csv("DATASET/dataset_npl.csv")
+DATASET_PATH = os.path.join("DATASET", "dataset_npl.csv")
+df = pd.read_csv(DATASET_PATH)
 
 # Dictionary untuk mapping dan dropdown options
 PEKERJAAN_OPTIONS = {
@@ -61,8 +62,8 @@ PEKERJAAN_OPTIONS = {
 
 STATUS_PERNIKAHAN_OPTIONS = {"K": "Kawin", "B": "Belum Kawin", "C": "Cerai"}
 
-PRODUK_OPTIONS = sorted(df["PRODUK"].unique().tolist())
-SUB_PRODUK_OPTIONS = sorted(df["SUB_PRODUK"].dropna().unique().tolist())
+PRODUK_OPTIONS = sorted(df["Produk"].unique().tolist())
+SUB_PRODUK_OPTIONS = sorted(df["Sub Produk"].dropna().unique().tolist())
 
 HASIL_PRESCREENING_SIPKUR_OPTIONS = ["Sesuai", "Tidak Sesuai", "-"]
 HASIL_PRESCREENING_DUKCAPIL_OPTIONS = ["Sesuai", "Tidak Sesuai", "-"]
@@ -140,20 +141,23 @@ def predict_api():
         # Prepare input data sesuai dengan fitur yang dibutuhkan model
         # Urutan harus sesuai dengan metadata.features
         input_data = {
-            "Produk": data["produk"],
-            "Status Pernikahan": data["status_pernikahan"],
-            "Jangka Waktu": int(data["jangka_waktu"]),
-            "Sub Produk": data["sub_produk"],
             "Usia": usia,
-            "Hasil Prescreening SIPKUR": data["hasil_prescreening_sipkur"],
             "Status Aplikasi": data["status_aplikasi"],
             "Plafond": float(data["plafond"]),
-            "Hasil Prescreening Dukcapil": data["hasil_prescreening_dukcapil"],
+            "Produk": data["produk"],
             "Pekerjaan": int(data["pekerjaan"]),
+            "Sub Produk": data["sub_produk"],
+            "Hasil Prescreening SIPKUR": data["hasil_prescreening_sipkur"],
+            "Hasil Prescreening Dukcapil": data["hasil_prescreening_dukcapil"],
+            "Status Pernikahan": data["status_pernikahan"],
+            "Jangka Waktu": int(data["jangka_waktu"]),
         }
 
         # Convert to DataFrame
         input_df = pd.DataFrame([input_data])
+
+        # Reorder columns to match the order in metadata.features
+        input_df = input_df[metadata["features"]]
 
         # Encode categorical features
         categorical_features = [
