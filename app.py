@@ -8,24 +8,18 @@ from datetime import datetime
 app = Flask(__name__)
 
 # Load model and preprocessors
-MODEL_DIR = "models"
-METADATA_FILE = os.path.join(MODEL_DIR, "model_metadata_20251221_100403.json")
+MODEL_DIR = "models/model_20251221_202851"
+METADATA_FILE = os.path.join(MODEL_DIR, "model_metadata.json")
 
 # Load metadata
 with open(METADATA_FILE, "r") as f:
     metadata = json.load(f)
 
 # Load model dan preprocessors
-model = joblib.load(
-    os.path.join(MODEL_DIR, "best_model_lightgbm_20251221_100403.joblib")
-)
-label_encoders = joblib.load(
-    os.path.join(MODEL_DIR, "label_encoders_20251221_100403.joblib")
-)
-target_encoder = joblib.load(
-    os.path.join(MODEL_DIR, "target_encoder_20251221_100403.joblib")
-)
-scaler = joblib.load(os.path.join(MODEL_DIR, "scaler_20251221_100403.joblib"))
+model = joblib.load(os.path.join(MODEL_DIR, "best_model_random_forest.joblib"))
+label_encoders = joblib.load(os.path.join(MODEL_DIR, "label_encoders.joblib"))
+target_encoder = joblib.load(os.path.join(MODEL_DIR, "target_encoder.joblib"))
+scaler = joblib.load(os.path.join(MODEL_DIR, "scaler.joblib"))
 
 # Load dataset untuk mendapatkan unique values untuk dropdown
 DATASET_PATH = os.path.join("DATASET", "dataset_npl.csv")
@@ -212,9 +206,9 @@ def predict_api():
 
         # Rekomendasi
         if prediction_label == "Lancar":
-            rekomendasi = "✅ Pemohon layak mendapatkan kredit dengan risiko rendah."
+            rekomendasi = "Pemohon layak mendapatkan kredit dengan risiko rendah."
         else:
-            rekomendasi = "⚠️ Pemohon memiliki risiko kredit macet yang tinggi. Perlu evaluasi lebih lanjut."
+            rekomendasi = "Pemohon memiliki risiko kredit macet yang tinggi. Perlu evaluasi lebih lanjut."
 
         result = {
             "status": "success",
