@@ -1,0 +1,43 @@
+{
+    "created_date": "2026-01-11 15:08:25",
+    "random_state": 42,
+    "total_samples": 1500,
+    "splits": {
+        "80-20": {
+            "train_size": 1200,
+            "test_size": 300,
+            "train_distribution": {
+                "0": 880,
+                "1": 320
+            },
+            "test_distribution": {
+                "0": 220,
+                "1": 80
+            }
+        },
+        "70-30": {
+            "train_size": 1050,
+            "test_size": 450,
+            "train_distribution": {
+                "0": 770,
+                "1": 280
+            },
+            "test_distribution": {
+                "0": 330,
+                "1": 120
+            }
+        },
+        "60-40": {
+            "train_size": 900,
+            "test_size": 600,
+            "train_distribution": {
+                "0": 660,
+                "1": 240
+            },
+            "test_distribution": {
+                "0": 440,
+                "1": 160
+            }
+        }
+    }
+}
