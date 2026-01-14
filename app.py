@@ -8,7 +8,7 @@ from datetime import datetime
 app = Flask(__name__)
 
 # Load model and preprocessors
-MODEL_DIR = "models/model_20260114_121429"
+MODEL_DIR = "models/model_20260114_221327"
 METADATA_FILE = os.path.join(MODEL_DIR, "model_metadata.json")
 
 # Load metadata
@@ -26,42 +26,54 @@ DATASET_PATH = os.path.join("DATASET", "dataset_npl.csv")
 df = pd.read_csv(DATASET_PATH)
 
 # Dictionary untuk mapping dan dropdown options
-PEKERJAAN_OPTIONS = {
-    "37": "Pegawai pemerintahan/lembaga negara",
-    "9": "Pengajar (Guru, Dosen)",
-    "1": "PNS",
-    "10": "Dokter/Perawat/Tenaga Kesehatan",
-    "11": "Pengacara/Notaris",
-    "12": "Akuntan",
-    "13": "Arsitek/Desainer",
-    "14": "Pilot/Pramugari",
-    "15": "Jurnalis/Wartawan",
-    "16": "Artis/Selebriti",
-    "17": "Atlet",
-    "18": "Tentara/Polisi",
-    "19": "Pengusaha",
-    "20": "Pedagang",
-    "21": "Petani/Peternak",
-    "22": "Nelayan",
-    "23": "Tukang/Buruh",
-    "24": "Sopir/Driver",
-    "25": "Ojek Online",
-    "26": "Karyawan Swasta",
-    "27": "Freelancer",
-    "28": "Ibu Rumah Tangga",
-    "29": "Pensiunan",
-    "30": "Mahasiswa",
-    "31": "Belum Bekerja",
-}
+# Nilai harus sesuai dengan label encoder dari model
+PEKERJAAN_OPTIONS = [
+    "Accounting/Finance Officer",
+    "Administrasi umum",
+    "Buruh (buruh pabrik,buruh bangunan,buruhtani)",
+    "Dokter",
+    "Eksekutif",
+    "Engineering",
+    "Hukum (Pengacara, Notaris)",
+    "Ibu rumah tangga",
+    "Konsultan/Analis",
+    "Lain-Lain",
+    "Marketing",
+    "Militer",
+    "Nelayan",
+    "Pegawai pemerintahan/lembaga negara",
+    "Pejabat negara/penyelenggara negara",
+    "Pelajar/Mahasiswa",
+    "Pengajar (Guru,Dosen)",
+    "Pengamanan",
+    "Pensiunan",
+    "Perhotelan & restoran (Koki,Bartender, dsb)",
+    "Peternak",
+    "Polisi",
+    "Teknologi informasi",
+    "Tenaga Medis (Perawat, Bidan, dan sebagainya)",
+    "Transportasi darat (masinis, sopir,kondektur)",
+    "Wiraswasta",
+]
 
-STATUS_PERNIKAHAN_OPTIONS = {"K": "Kawin", "B": "Belum Kawin", "C": "Cerai"}
+STATUS_PERNIKAHAN_OPTIONS = ["Kawin", "Belum Kawin", "Cerai"]
 
-PRODUK_OPTIONS = sorted(df["Produk"].unique().tolist())
-SUB_PRODUK_OPTIONS = sorted(df["Sub Produk"].dropna().unique().tolist())
+PRODUK_OPTIONS = ["Konsumer", "Mikro"]
+SUB_PRODUK_OPTIONS = [
+    "Kredit Multi Guna",
+    "Kredit Pemilikan Rumah",
+    "Mikro Kredit Usaha Rakyat",
+    "Mikro Non - Kredit Usaha Rakyat",
+]
 
-HASIL_PRESCREENING_SIPKUR_OPTIONS = ["Sesuai", "Tidak Sesuai", "-"]
-HASIL_PRESCREENING_DUKCAPIL_OPTIONS = ["Sesuai", "Tidak Sesuai", "-"]
-STATUS_APLIKASI_OPTIONS = ["Accept", "Reject", "Waiting Approval", "Under Review"]
+HASIL_PRESCREENING_SIPKUR_OPTIONS = [
+    "TIDAK DILAKUKAN",
+    "Terdaftar KUR",
+    "Terdaftar KUR di Bank Lain",
+    "Tidak Terdaftar KUR",
+]
+HASIL_PRESCREENING_DUKCAPIL_OPTIONS = ["Sesuai", "Tidak Sesuai"]
+STATUS_APLIKASI_OPTIONS = ["Accept", "Lolos Bersyarat", "Reject", "Waiting Approval"]
 
 
 @app.route("/")
@@ -135,16 +147,16 @@ def predict_api():
         # Prepare input data sesuai dengan fitur yang dibutuhkan model
         # Urutan harus sesuai dengan metadata.features
         input_data = {
-            "Jangka Waktu": int(data["jangka_waktu"]),
-            "Produk": data["produk"],
-            "Pekerjaan": int(data["pekerjaan"]),
             "Sub Produk": data["sub_produk"],
-            "Plafond": float(data["plafond"]),
-            "Usia": usia,
-            "Hasil Prescreening Dukcapil": data["hasil_prescreening_dukcapil"],
             "Status Aplikasi": data["status_aplikasi"],
-            "Hasil Prescreening SIPKUR": data["hasil_prescreening_sipkur"],
+            "Plafond": float(data["plafond"]),
+            "Jangka Waktu": int(data["jangka_waktu"]),
+            "Hasil Prescreening Dukcapil": data["hasil_prescreening_dukcapil"],
+            "Produk": data["produk"],
             "Status Pernikahan": data["status_pernikahan"],
+            "Usia": usia,
+            "Pekerjaan": data["pekerjaan"],
+            "Hasil Prescreening SIPKUR": data["hasil_prescreening_sipkur"],
         }
 
         # Convert to DataFrame dengan urutan yang benar
@@ -154,28 +166,29 @@ def predict_api():
         print("DEBUG - Expected features:", metadata["features"])
 
         # Encode categorical features
-        categorical_features = [
-            "Produk",
-            "Status Pernikahan",
-            "Sub Produk",
-            "Hasil Prescreening SIPKUR",
-            "Status Aplikasi",
-            "Hasil Prescreening Dukcapil",
-        ]
-
-        for feature in categorical_features:
-            if feature in label_encoders:
+        for col in input_df.columns:
+            if col in label_encoders:
                 try:
-                    input_df[feature] = label_encoders[feature].transform(
-                        input_df[feature]
+                    input_df[col] = label_encoders[col].transform(input_df[col])
+                except ValueError as e:
+                    print(f"DEBUG - Error encoding {col}: {e}")
+                    print(f"DEBUG - Valid values: {list(label_encoders[col].classes_)}")
+                    print(f"DEBUG - Received value: {input_df[col].values[0]}")
+                    return (
+                        jsonify(
+                            {
+                                "status": "error",
+                                "message": f"Nilai '{input_df[col].values[0]}' tidak valid untuk {col}",
+                            }
+                        ),
+                        400,
                     )
-                except Exception as e:
-                    print(f"DEBUG - Error encoding {feature}: {e}")
-                    # Jika nilai tidak ada dalam label encoder, gunakan nilai default
-                    input_df[feature] = 0
 
         print("DEBUG - After encoding:", input_df.dtypes)
         print("DEBUG - DataFrame values:", input_df.values)
+
+        # Pastikan semua data numeric
+        input_df = input_df.astype(float)
 
         # Scale features - convert to numpy array to avoid feature name issues
         input_scaled = scaler.transform(input_df.values)
@@ -226,14 +239,10 @@ def predict_api():
             "rekomendasi": rekomendasi,
             "input_summary": {
                 "usia": usia,
-                "pekerjaan": PEKERJAAN_OPTIONS.get(
-                    data["pekerjaan"], data["pekerjaan"]
-                ),
+                "pekerjaan": data["pekerjaan"],
                 "plafond": f"Rp {float(data['plafond']):,.0f}",
                 "jangka_waktu": f"{data['jangka_waktu']} bulan",
-                "status_pernikahan": STATUS_PERNIKAHAN_OPTIONS.get(
-                    data["status_pernikahan"], data["status_pernikahan"]
-                ),
+                "status_pernikahan": data["status_pernikahan"],
                 "produk": data["produk"],
                 "sub_produk": data["sub_produk"],
             },
