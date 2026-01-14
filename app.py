@@ -8,7 +8,7 @@ from datetime import datetime
 app = Flask(__name__)
 
 # Load model and preprocessors
-MODEL_DIR = "models/model_20251231_125152"
+MODEL_DIR = "models/model_20260114_121429"
 METADATA_FILE = os.path.join(MODEL_DIR, "model_metadata.json")
 
 # Load metadata
@@ -135,23 +135,23 @@ def predict_api():
         # Prepare input data sesuai dengan fitur yang dibutuhkan model
         # Urutan harus sesuai dengan metadata.features
         input_data = {
-            "Usia": usia,
-            "Status Aplikasi": data["status_aplikasi"],
-            "Plafond": float(data["plafond"]),
+            "Jangka Waktu": int(data["jangka_waktu"]),
             "Produk": data["produk"],
             "Pekerjaan": int(data["pekerjaan"]),
             "Sub Produk": data["sub_produk"],
-            "Hasil Prescreening SIPKUR": data["hasil_prescreening_sipkur"],
+            "Plafond": float(data["plafond"]),
+            "Usia": usia,
             "Hasil Prescreening Dukcapil": data["hasil_prescreening_dukcapil"],
+            "Status Aplikasi": data["status_aplikasi"],
+            "Hasil Prescreening SIPKUR": data["hasil_prescreening_sipkur"],
             "Status Pernikahan": data["status_pernikahan"],
-            "Jangka Waktu": int(data["jangka_waktu"]),
         }
 
-        # Convert to DataFrame
-        input_df = pd.DataFrame([input_data])
+        # Convert to DataFrame dengan urutan yang benar
+        input_df = pd.DataFrame([input_data], columns=metadata["features"])
 
-        # Reorder columns to match the order in metadata.features
-        input_df = input_df[metadata["features"]]
+        print("DEBUG - Input columns:", input_df.columns.tolist())
+        print("DEBUG - Expected features:", metadata["features"])
 
         # Encode categorical features
         categorical_features = [
@@ -169,12 +169,16 @@ def predict_api():
                     input_df[feature] = label_encoders[feature].transform(
                         input_df[feature]
                     )
-                except:
+                except Exception as e:
+                    print(f"DEBUG - Error encoding {feature}: {e}")
                     # Jika nilai tidak ada dalam label encoder, gunakan nilai default
                     input_df[feature] = 0
 
-        # Scale features
-        input_scaled = scaler.transform(input_df)
+        print("DEBUG - After encoding:", input_df.dtypes)
+        print("DEBUG - DataFrame values:", input_df.values)
+
+        # Scale features - convert to numpy array to avoid feature name issues
+        input_scaled = scaler.transform(input_df.values)
 
         # Predict
         prediction = model.predict(input_scaled)
