@@ -8,7 +8,7 @@ from datetime import datetime
 app = Flask(__name__)
 
 # Load model and preprocessors
-MODEL_DIR = "models/model_20260112_100139"
+MODEL_DIR = "models/model_20260114_121429"
 METADATA_FILE = os.path.join(MODEL_DIR, "model_metadata.json")
 
 # Load metadata
