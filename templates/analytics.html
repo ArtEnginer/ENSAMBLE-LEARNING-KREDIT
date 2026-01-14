@@ -77,7 +77,7 @@
                         <th class="px-4 py-3 text-left font-semibold text-gray-700">Kategori</th>
                         <th class="px-4 py-3 text-center font-semibold text-gray-700">Total</th>
                         <th class="px-4 py-3 text-center font-semibold text-gray-700">Lancar</th>
-                        <th class="px-4 py-3 text-center font-semibold text-gray-700">Macet</th>
+                        <th class="px-4 py-3 text-center font-semibold text-gray-700">Tidak lancar</th>
                         <th class="px-4 py-3 text-center font-semibold text-gray-700">Rasio (%)</th>
                     </tr>
                 </thead>
@@ -128,19 +128,19 @@
             const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
 
             if (!monthlyData[monthKey]) {
-                monthlyData[monthKey] = { lancar: 0, macet: 0 };
+                monthlyData[monthKey] = { lancar: 0, tidakLancar: 0 };
             }
 
             if (item.prediction === 'Lancar') {
                 monthlyData[monthKey].lancar++;
             } else {
-                monthlyData[monthKey].macet++;
+                monthlyData[monthKey].tidakLancar++;
             }
         });
 
         const labels = Object.keys(monthlyData).sort();
         const lancarData = labels.map(key => monthlyData[key].lancar);
-        const macetData = labels.map(key => monthlyData[key].macet);
+        const tidakLancarData = labels.map(key => monthlyData[key].tidakLancar);
 
         new Chart(ctx, {
             type: 'bar',
@@ -152,7 +152,7 @@
                     backgroundColor: '#10b981'
                 }, {
                     label: 'Tidak Lancar',
-                    data: macetData,
+                    data: tidakLancarData,
                     backgroundColor: '#ef4444'
                 }]
             },
@@ -313,7 +313,7 @@
             const filtered = history.filter(filter);
             const total = filtered.length;
             const lancar = filtered.filter(item => item.prediction === 'Lancar').length;
-            const macet = total - lancar;
+            const tidakLancar = total - lancar;
             const ratio = total > 0 ? ((lancar / total) * 100).toFixed(1) : 0;
 
             return `
@@ -321,7 +321,7 @@
                     <td class="px-4 py-3 font-medium text-gray-800">${name}</td>
                     <td class="px-4 py-3 text-center">${total}</td>
                     <td class="px-4 py-3 text-center text-green-600 font-semibold">${lancar}</td>
-                    <td class="px-4 py-3 text-center text-red-600 font-semibold">${macet}</td>
+                    <td class="px-4 py-3 text-center text-red-600 font-semibold">${tidakLancar}</td>
                     <td class="px-4 py-3 text-center">
                         <span class="px-3 py-1 rounded-full text-xs font-semibold ${ratio >= 70 ? 'bg-green-100 text-green-800' : ratio >= 50 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}">
                             ${ratio}%

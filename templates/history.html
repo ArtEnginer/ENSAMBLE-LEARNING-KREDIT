@@ -82,8 +82,8 @@
             <div class="bg-red-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
                 <i class="fas fa-times text-red-600 text-2xl"></i>
             </div>
-            <p class="text-3xl font-bold text-red-600" id="statMacet">0</p>
-            <p class="text-gray-500 text-sm">Kredit Macet</p>
+            <p class="text-3xl font-bold text-red-600" id="statTidakLancar">0</p>
+            <p class="text-gray-500 text-sm">Kredit Tidak Lancar</p>
         </div>
         <div class="card-android material-shadow p-6 text-center">
             <div class="bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -170,12 +170,12 @@
     function updateStatistics() {
         const total = allHistory.length;
         const lancar = allHistory.filter(p => p.prediction === 'Lancar').length;
-        const macet = allHistory.filter(p => p.prediction === 'Tidak Lancar').length;
+        const tidakLancar = allHistory.filter(p => p.prediction === 'Tidak Lancar').length;
         const ratio = total > 0 ? ((lancar / total) * 100).toFixed(1) : 0;
 
         document.getElementById('statTotal').textContent = total;
         document.getElementById('statLancar').textContent = lancar;
-        document.getElementById('statMacet').textContent = macet;
+        document.getElementById('statTidakLancar').textContent = tidakLancar;
         document.getElementById('statRatio').textContent = ratio + '%';
     }
 
@@ -342,7 +342,7 @@
                         </div>
                     </div>
                     <div class="border rounded-xl p-4 text-center">
-                        <p class="text-sm text-gray-500 mb-2">Probabilitas Macet</p>
+                        <p class="text-sm text-gray-500 mb-2">Probabilitas TidakLancar</p>
                         <p class="text-3xl font-bold text-red-600">${item.probability.tidak_lancar}%</p>
                         <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
                             <div class="bg-red-500 h-2 rounded-full" style="width: ${item.probability.tidak_lancar}%"></div>
@@ -434,7 +434,7 @@
             return;
         }
 
-        const headers = ['Timestamp', 'Prediksi', 'Risiko', 'Prob_Lancar', 'Prob_Macet', 'Usia', 'Pekerjaan', 'Status', 'Plafond', 'Tenor', 'Produk', 'Sub_Produk'];
+        const headers = ['Timestamp', 'Prediksi', 'Risiko', 'Prob_Lancar', 'Prob_TidakLancar', 'Usia', 'Pekerjaan', 'Status', 'Plafond', 'Tenor', 'Produk', 'Sub_Produk'];
         const csvContent = [
             headers.join(','),
             ...allHistory.map(item => [

@@ -62,9 +62,9 @@
         <div class="card-android material-shadow p-6 border-l-4 border-red-500">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-gray-500 text-sm font-medium mb-1">Kredit Macet</p>
-                    <p class="text-3xl font-bold text-gray-800" id="macetCount">0</p>
-                    <p class="text-xs text-gray-500 mt-1" id="macetPercentage">0% dari total</p>
+                    <p class="text-gray-500 text-sm font-medium mb-1">Kredit Tidak Lancar</p>
+                    <p class="text-3xl font-bold text-gray-800" id="tidakLancarCount">0</p>
+                    <p class="text-xs text-gray-500 mt-1" id="tidakLancarPercentage">0% dari total</p>
                 </div>
                 <div class="bg-red-100 p-4 rounded-full">
                     <i class="fas fa-exclamation-circle text-red-600 text-2xl"></i>
@@ -287,16 +287,16 @@
         document.getElementById('totalPredictions').textContent = history.length;
 
         const lancarCount = history.filter(p => p.prediction === 'Lancar').length;
-        const macetCount = history.filter(p => p.prediction === 'Tidak Lancar').length;
+        const tidakLancarCount = history.filter(p => p.prediction === 'Tidak Lancar').length;
 
         document.getElementById('lancarCount').textContent = lancarCount;
-        document.getElementById('macetCount').textContent = macetCount;
+        document.getElementById('tidakLancarCount').textContent = tidakLancarCount;
 
         if (history.length > 0) {
             document.getElementById('lancarPercentage').textContent =
                 `${((lancarCount / history.length) * 100).toFixed(1)}% dari total`;
-            document.getElementById('macetPercentage').textContent =
-                `${((macetCount / history.length) * 100).toFixed(1)}% dari total`;
+            document.getElementById('tidakLancarPercentage').textContent =
+                `${((tidakLancarCount / history.length) * 100).toFixed(1)}% dari total`;
         }
 
         // Load recent predictions
@@ -421,7 +421,7 @@
     // Get counts for charts
     const history = getPredictionHistory();
     const lancarCount = history.filter(p => p.prediction === 'Lancar').length;
-    const macetCount = history.filter(p => p.prediction === 'Tidak Lancar').length;
+    const tidakLancarCount = history.filter(p => p.prediction === 'Tidak Lancar').length;
 
     // Initialize dashboard
     document.addEventListener('DOMContentLoaded', function () {
